@@ -1,0 +1,34 @@
+{
+  "name": "rayzell-store-ppob",
+  "version": "1.2.0",
+  "description": "Bot PPOB Telegram + web storefront (etalase, cek transaksi) dengan Digiflazz, saldo, QRIS, PostgreSQL, Redis, dan Local Bot API.",
+  "main": "src/main.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/main.js",
+    "web": "node src/web/server.js",
+    "dev": "node --watch src/main.js"
+  },
+  "keywords": [
+    "ppob",
+    "telegram",
+    "bot",
+    "digiflazz",
+    "pulsa",
+    "qris",
+    "web"
+  ],
+  "author": "Rayzell25",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "axios": "^1.7.2",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "node-telegram-bot-api": "^0.66.0",
+    "pg": "^8.12.0",
+    "redis": "^4.7.0"
+  }
+}
