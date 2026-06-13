@@ -20,7 +20,5 @@ Route::any('/logout', function () {
     return redirect('/');
 })->name('logout');
 
-use App\Http\Controllers\Auth\SocialLoginController;
-
-Route::get('/auth/{provider}/redirect', [SocialLoginController::class, 'redirect']);
-Route::get('/auth/{provider}/callback', [SocialLoginController::class, 'callback']);
+Route::get('/auth/{provider}/redirect', [App\Http\Controllers\SocialLoginController::class, 'redirect'])->name('social.redirect');
+Route::get('/auth/{provider}/callback', [App\Http\Controllers\SocialLoginController::class, 'callback'])->name('social.callback');

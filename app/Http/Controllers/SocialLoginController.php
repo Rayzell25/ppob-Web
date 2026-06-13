@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 use Exception;
+use Illuminate\Support\Facades\Log;
 
 class SocialLoginController extends Controller
 {
@@ -46,12 +47,10 @@ class SocialLoginController extends Controller
 
         try {
             $socialUser = Socialite::driver($provider)->user();
-
-            // Find or create user
             $user = null;
 
             if ($provider === 'google') {
-                // Try finding by google_id, then by email
+                // Find by google_id first, then by email
                 $user = User::where('google_id', $socialUser->getId())->first();
 
                 if (!$user && $socialUser->getEmail()) {
@@ -64,18 +63,18 @@ class SocialLoginController extends Controller
                         'email' => $socialUser->getEmail(),
                         'google_id' => $socialUser->getId(),
                         'avatar_url' => $socialUser->getAvatar(),
-                        'role' => 'MEMBER',
+                        'password' => Hash::make(Str::random(24)),
+                        'role' => 'user',
                         'balance' => 0,
                     ]);
                 } else {
-                    // Update Google ID and Avatar if they were not linked yet
                     $user->update([
                         'google_id' => $socialUser->getId(),
                         'avatar_url' => $socialUser->getAvatar() ?: $user->avatar_url,
                     ]);
                 }
             } elseif ($provider === 'telegram') {
-                // Telegram provider
+                // Find by telegram_id
                 $user = User::where('telegram_id', $socialUser->getId())->first();
 
                 if (!$user) {
@@ -84,7 +83,8 @@ class SocialLoginController extends Controller
                         'telegram_id' => $socialUser->getId(),
                         'telegram_username' => $socialUser->getNickname(),
                         'avatar_url' => $socialUser->getAvatar(),
-                        'role' => 'MEMBER',
+                        'password' => Hash::make(Str::random(24)),
+                        'role' => 'user',
                         'balance' => 0,
                     ]);
                 } else {
@@ -101,7 +101,7 @@ class SocialLoginController extends Controller
                 }
 
                 Auth::login($user, true);
-                return redirect()->intended('/home');
+                return redirect('/');
             }
 
             return redirect('/login')->with('error', 'Authentication failed.');
