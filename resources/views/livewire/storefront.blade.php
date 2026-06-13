@@ -1,87 +1,71 @@
-<div class="space-y-12">
-    <!-- Quick Login Helper Bar (for local development testing) -->
-    <div class="bg-slate-900/40 border border-slate-900 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
-        <div class="flex items-center gap-3">
-            <span class="flex h-3 w-3 relative">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-3 w-3 bg-indigo-500"></span>
-            </span>
-            <p class="text-sm text-slate-300 font-medium">
-                @auth
-                    Masuk sebagai: <strong class="text-indigo-400">{{ auth()->user()->name }}</strong> ({{ ucfirst(auth()->user()->role) }})
-                @else
-                    Mode Demo: Anda belum masuk. Gunakan tombol cepat di samping untuk uji coba.
-                @endauth
-            </p>
-        </div>
-        <div class="flex flex-wrap items-center gap-2">
-            <button wire:click="quickLogin('user')" class="text-xs font-semibold px-3.5 py-1.5 bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 rounded-xl border border-indigo-500/20 transition">
-                ⚡ Login Pembeli (User)
-            </button>
-            <button wire:click="quickLogin('admin')" class="text-xs font-semibold px-3.5 py-1.5 bg-purple-600/10 hover:bg-purple-600/20 text-purple-400 rounded-xl border border-purple-500/20 transition">
-                ⚡ Login Pemilik (Admin)
-            </button>
-            @auth
-                <button wire:click="quickLogin('logout')" class="text-xs font-semibold px-3.5 py-1.5 bg-rose-600/10 hover:bg-rose-600/20 text-rose-400 rounded-xl border border-rose-500/20 transition">
-                    🚪 Logout
-                </button>
-            @endauth
-        </div>
-    </div>
-
+<div x-data="{ activeCategory: {{ $categories->first() ? $categories->first()->id : 'null' }} }" class="space-y-8">
     <!-- Alert Messages -->
     @if (session()->has('success'))
-        <div class="bg-emerald-950/40 border border-emerald-900 text-emerald-400 p-4 rounded-2xl flex items-start gap-3 shadow-lg shadow-emerald-950/10">
+        <div class="bg-emerald-950/40 border border-emerald-900/60 text-emerald-400 p-4 rounded-2xl flex items-start gap-3 shadow-lg shadow-emerald-950/10">
             <span class="text-lg">✅</span>
             <div>
-                <p class="font-semibold">Sukses</p>
-                <p class="text-sm text-slate-300 mt-0.5">{{ session('success') }}</p>
+                <p class="font-bold text-sm text-emerald-300">Sukses</p>
+                <p class="text-xs text-slate-300 mt-0.5">{{ session('success') }}</p>
             </div>
         </div>
     @endif
 
     @if (session()->has('error'))
-        <div class="bg-rose-950/40 border border-rose-900 text-rose-400 p-4 rounded-2xl flex items-start gap-3 shadow-lg shadow-rose-950/10">
+        <div class="bg-rose-950/40 border border-rose-900/60 text-rose-400 p-4 rounded-2xl flex items-start gap-3 shadow-lg shadow-rose-950/10">
             <span class="text-lg">❌</span>
             <div>
-                <p class="font-semibold">Gagal</p>
-                <p class="text-sm text-slate-300 mt-0.5">{{ session('error') }}</p>
+                <p class="font-bold text-sm text-rose-300">Gagal</p>
+                <p class="text-xs text-slate-300 mt-0.5">{{ session('error') }}</p>
             </div>
         </div>
     @endif
 
+    <!-- Category Tabs (Horizontal Scroll) -->
+    <div class="bg-slate-900/60 border border-slate-800/80 p-2 rounded-2xl sticky top-20 z-30 backdrop-blur-md">
+        <div class="flex items-center space-x-2 overflow-x-auto pb-1 scrollbar-none">
+            @foreach($categories as $category)
+                <button 
+                    @click="activeCategory = {{ $category->id }}"
+                    :class="activeCategory === {{ $category->id }} ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-indigo-600/35 border-transparent' : 'bg-slate-950/40 text-slate-400 hover:text-slate-200 hover:bg-slate-800 border-slate-800'"
+                    class="px-5 py-2.5 rounded-xl text-xs font-bold tracking-wide uppercase transition duration-200 border whitespace-nowrap flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full" :class="activeCategory === {{ $category->id }} ? 'bg-white' : 'bg-slate-600'"></span>
+                    {{ $category->name }}
+                </button>
+            @endforeach
+        </div>
+    </div>
+
     <!-- Catalog Sections -->
     @foreach($categories as $category)
-        <div class="space-y-6">
-            <div class="flex items-center gap-4">
-                <h2 class="text-2xl font-bold tracking-tight text-white">{{ $category->name }}</h2>
-                <div class="h-[1px] flex-grow bg-slate-900"></div>
-            </div>
-
+        <div x-show="activeCategory === {{ $category->id }}" class="space-y-8" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" style="display: none;">
             @foreach($category->brands as $brand)
                 @if($brand->products->isNotEmpty())
                     <div class="space-y-4">
-                        <h3 class="text-sm font-semibold text-slate-400 tracking-wider uppercase">{{ $brand->name }}</h3>
-                        
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        <div class="flex items-center gap-3">
+                            <h3 class="text-xs font-bold tracking-wider text-slate-500 uppercase">{{ $brand->name }}</h3>
+                            <div class="h-[1px] flex-grow bg-slate-900"></div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                             @foreach($brand->products as $product)
-                                <div class="bg-slate-900/40 border border-slate-900 rounded-2xl p-5 hover:border-slate-800 hover:shadow-xl hover:shadow-slate-950/40 transition flex flex-col justify-between group">
-                                    <div class="space-y-2">
+                                <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 hover:border-blue-500 hover:shadow-2xl hover:shadow-indigo-950/20 transition-all duration-305 flex flex-col justify-between group relative overflow-hidden">
+                                    <div class="absolute -right-16 -top-16 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl group-hover:bg-indigo-500/10 transition-all duration-300"></div>
+                                    <div class="space-y-3 relative z-10">
                                         <div class="flex items-start justify-between gap-2">
-                                            <h4 class="font-bold text-white group-hover:text-indigo-400 transition">{{ $product->name }}</h4>
-                                            <span class="text-[10px] font-mono bg-slate-900 text-slate-400 px-2 py-0.5 rounded border border-slate-800">
+                                            <h4 class="font-extrabold text-sm text-white group-hover:text-blue-400 transition-colors duration-200">{{ $product->name }}</h4>
+                                            <span class="text-[9px] font-mono font-bold bg-slate-900/80 text-blue-400 px-2 py-0.5 rounded-lg border border-slate-700/60 uppercase tracking-wider">
                                                 {{ $product->sku }}
                                             </span>
                                         </div>
-                                        <p class="text-xs text-slate-400 line-clamp-2">{{ $product->description ?? 'Layanan pengisian pulsa/data instan otomatis.' }}</p>
+                                        <p class="text-xs text-slate-400 leading-relaxed">{{ $product->description ?? 'Layanan pengisian pulsa/data instan otomatis.' }}</p>
                                     </div>
                                     
-                                    <div class="flex items-center justify-between mt-6 pt-4 border-t border-slate-900">
+                                    <div class="flex items-center justify-between mt-6 pt-4 border-t border-slate-700/50 relative z-10">
                                         <div>
-                                            <p class="text-[10px] text-slate-500">Harga</p>
-                                            <p class="text-lg font-extrabold text-indigo-400">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
+                                            <p class="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Harga</p>
+                                            <p class="text-base font-extrabold text-emerald-400">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
                                         </div>
-                                        <button wire:click="selectProduct({{ $product->id }})" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg shadow-indigo-600/10 hover:shadow-indigo-600/20 transition duration-150">
+                                        <button wire:click="selectProduct({{ $product->id }})" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg shadow-indigo-600/10 hover:shadow-indigo-600/35 transition-all duration-200">
                                             Beli Sekarang
                                         </button>
                                     </div>
@@ -118,7 +102,7 @@
                         </div>
                         <div class="flex justify-between">
                             <span class="text-xs text-slate-400">Harga</span>
-                            <span class="text-xs font-extrabold text-indigo-400">Rp {{ number_format($selected_product->price, 0, ',', '.') }}</span>
+                            <span class="text-xs font-extrabold text-emerald-400">Rp {{ number_format($selected_product->price, 0, ',', '.') }}</span>
                         </div>
                     </div>
 
