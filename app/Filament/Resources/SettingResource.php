@@ -14,9 +14,11 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\ColorPicker;
 
@@ -28,50 +30,52 @@ class SettingResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                Tabs::make('Pengaturan Web')
-                    ->tabs([
-                        Tabs\Tab::make('Identitas Toko')->schema([
-                            TextInput::make('web_name')
-                                ->label('Nama Toko')
-                                ->required(),
-                            TextInput::make('admin_whatsapp')
-                                ->label('Link WhatsApp'),
-                            FileUpload::make('logo')
-                                ->label('Logo Toko')
-                                ->directory('logos')
-                                ->image(),
+        return $form->schema([
+            Tabs::make('Pengaturan Web PPOB')->tabs([
+                
+                Tabs\Tab::make('Identitas Toko')
+                    ->icon('heroicon-o-building-storefront')
+                    ->schema([
+                        // Grid Responsif: 1 kolom di HP (default), 2 kolom di Tablet (md), 2 kolom di PC (lg)
+                        Grid::make(['default' => 1, 'md' => 2, 'lg' => 2])->schema([
+                            TextInput::make('web_name')->label('Nama Web/Toko')->required(),
+                            TextInput::make('admin_whatsapp')->label('WhatsApp Admin')->tel(),
                         ]),
-                        Tabs\Tab::make('Markup Global Default')->schema([
-                            TextInput::make('default_member_markup')
-                                ->numeric()
-                                ->label('Untung Member'),
-                            TextInput::make('default_reseller_markup')
-                                ->numeric()
-                                ->label('Untung Reseller'),
-                        ]),
-                        Tabs\Tab::make('Popup Notifikasi')->schema([
-                            Toggle::make('popup_active')
-                                ->label('Aktifkan Tampilan Popup?'),
-                            TextInput::make('popup_title')
-                                ->label('Judul Popup (cth: Informasi Penting)'),
-                            FileUpload::make('popup_image')
-                                ->label('Gambar/Foto Popup')
-                                ->directory('popups')
-                                ->image(),
-                            Textarea::make('popup_text')
-                                ->label('Isi Pesan/Deskripsi'),
-                            TextInput::make('popup_button_text')
-                                ->label('Teks Tombol (cth: Saya Paham)'),
-                            ColorPicker::make('popup_button_bg_color')
-                                ->label('Warna Background Tombol'),
-                            ColorPicker::make('popup_button_color')
-                                ->label('Warna Teks Tombol'),
-                        ]),
-                    ])
-                    ->columnSpanFull()
-            ]);
+                        FileUpload::make('logo')->label('Logo Web')->directory('logos')->image()->columnSpanFull(),
+                    ]),
+
+                Tabs\Tab::make('Markup Harga')
+                    ->icon('heroicon-o-currency-dollar')
+                    ->schema([
+                        Grid::make(['default' => 1, 'md' => 2])->schema([
+                            TextInput::make('default_member_markup')->label('Untung Global Member')->numeric()->prefix('Rp'),
+                            TextInput::make('default_reseller_markup')->label('Untung Global Reseller')->numeric()->prefix('Rp'),
+                        ])
+                    ]),
+
+                Tabs\Tab::make('Popup Notifikasi')
+                    ->icon('heroicon-o-megaphone')
+                    ->schema([
+                        Section::make('Status & Konten Popup')
+                            ->description('Atur tampilan popup saat user membuka web.')
+                            ->schema([
+                                Toggle::make('popup_active')->label('Aktifkan Popup?')->onColor('success'),
+                                TextInput::make('popup_title')->label('Judul Popup')->placeholder('Informasi Penting'),
+                                FileUpload::make('popup_image')->label('Gambar Promosi/Info')->directory('popups')->image(),
+                                Textarea::make('popup_text')->label('Isi Pesan/Deskripsi')->rows(3),
+                            ]),
+                        Section::make('Desain Tombol Popup')
+                            ->schema([
+                                // Grid Responsif: 1 kolom di HP, 3 kolom sejajar di Tablet/PC
+                                Grid::make(['default' => 1, 'md' => 3])->schema([
+                                    TextInput::make('popup_button_text')->label('Teks Tombol (Cth: Saya Paham)'),
+                                    ColorPicker::make('popup_button_bg_color')->label('Warna Background Tombol'),
+                                    ColorPicker::make('popup_button_color')->label('Warna Teks Tombol'),
+                                ])
+                            ])->collapsible(),
+                    ]),
+            ])->columnSpanFull()
+        ]);
     }
 
     public static function table(Table $table): Table

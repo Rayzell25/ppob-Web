@@ -31,9 +31,9 @@ class EditSetting extends EditRecord
         $data['popup_title'] = $data['popup_title'] ?? \App\Models\Setting::where('key', 'popup_title')->value('value') ?? '';
         $data['popup_image'] = $data['popup_image'] ?? \App\Models\Setting::where('key', 'popup_image')->value('value') ?? '';
         $data['popup_text'] = $data['popup_text'] ?? \App\Models\Setting::where('key', 'popup_text')->value('value') ?? '';
-        $data['popup_button_text'] = $data['popup_button_text'] ?? \App\Models\Setting::where('key', 'popup_button_text')->value('value') ?? '';
-        $data['popup_button_color'] = $data['popup_button_color'] ?? \App\Models\Setting::where('key', 'popup_button_color')->value('value') ?? '';
-        $data['popup_button_bg_color'] = $data['popup_button_bg_color'] ?? \App\Models\Setting::where('key', 'popup_button_bg_color')->value('value') ?? '';
+        $data['popup_button_text'] = $data['popup_button_text'] ?? \App\Models\Setting::where('key', 'popup_button_text')->value('value') ?? 'Saya Paham';
+        $data['popup_button_color'] = $data['popup_button_color'] ?? \App\Models\Setting::where('key', 'popup_button_color')->value('value') ?? '#ffffff';
+        $data['popup_button_bg_color'] = $data['popup_button_bg_color'] ?? \App\Models\Setting::where('key', 'popup_button_bg_color')->value('value') ?? '#3b82f6';
 
         return $data;
     }

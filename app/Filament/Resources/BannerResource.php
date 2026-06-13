@@ -34,8 +34,8 @@ class BannerResource extends Resource
                     ->default(true)
                     ->required(),
                 Forms\Components\TextInput::make('order')
+                    ->label('Urutan Slide (1, 2, 3...)')
                     ->numeric()
-                    ->label('Urutan Slide (Ketik 1, 2, 3, dst)')
                     ->default(1)
                     ->required(),
             ]);
@@ -46,16 +46,16 @@ class BannerResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\ImageColumn::make('image_path')
-                    ->label('Preview Banner'),
+                    ->label('Preview'),
                 Tables\Columns\TextColumn::make('title')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\IconColumn::make('is_active')
-                    ->boolean()
+                Tables\Columns\ToggleColumn::make('is_active')
+                    ->label('Aktif')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('order')
-                    ->sortable()
-                    ->label('Urutan Slide'),
+                Tables\Columns\TextInputColumn::make('order')
+                    ->label('Urutan')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
