@@ -1,10 +1,19 @@
 <!DOCTYPE html>
-<html lang="id" x-data="{ theme: localStorage.getItem('theme') || 'light' }" x-init="$watch('theme', val => localStorage.setItem('theme', val))" :class="theme === 'dark' ? 'dark' : ''">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Masuk - {{ \App\Models\Setting::where('key', 'store_name')->value('value') ?? \App\Models\Setting::where('key', 'web_name')->value('value') ?? 'Rayzell Store' }}</title>
     
+    <!-- Dark Mode Init Script -->
+    <script>
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark')
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+    </script>
+
     <!-- Google Fonts - Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,6 +22,9 @@
     <!-- Style & Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     
+    <!-- Alpine.js CDN -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -23,7 +35,17 @@
 
     <!-- Theme Toggle at Top Right -->
     <div class="fixed top-4 right-4 z-50">
-        <button @click="theme = theme === 'dark' ? 'light' : 'dark'" class="p-2.5 rounded-full bg-white dark:bg-slate-800 text-gray-600 dark:text-yellow-400 hover:bg-gray-100 dark:hover:bg-slate-700 transition shadow border border-gray-200 dark:border-slate-700">
+        <button x-data="{ theme: localStorage.theme || 'light' }" @click="
+            if (localStorage.theme === 'dark') {
+                localStorage.theme = 'light';
+                theme = 'light';
+                document.documentElement.classList.remove('dark');
+            } else {
+                localStorage.theme = 'dark';
+                theme = 'dark';
+                document.documentElement.classList.add('dark');
+            }
+        " class="p-2.5 rounded-full bg-white dark:bg-slate-800 text-gray-600 dark:text-yellow-400 hover:bg-gray-100 dark:hover:bg-slate-700 transition shadow border border-gray-200 dark:border-slate-700">
             <!-- Moon icon (when theme is light, toggle to dark) -->
             <svg x-show="theme === 'light'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
             <!-- Sun icon (when theme is dark, toggle to light) -->
