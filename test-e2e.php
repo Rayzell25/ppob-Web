@@ -195,7 +195,7 @@ printDBState();
 
 // Construct AutoGoPay Webhook request
 // Signature = hmac-sha256(payload, secret)
-$secret = 'default_secret'; // fallback used in WebhookController
+$secret = config('services.autogopay.secret') ?: 'default_secret';
 $payload = json_encode([
     'reference_id' => $transaction->reference_id,
     'status' => 'settlement',

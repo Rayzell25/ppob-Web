@@ -37,7 +37,7 @@ class WebhookController extends Controller
         $rawBody = $request->getContent();
 
         // Get AutoGoPay secret from config/env
-        $secret = env('AUTOGOPAY_SECRET') ?: \App\Models\Setting::where('key', 'autogopay_secret')->value('value') ?: 'default_secret';
+        $secret = config('services.autogopay.secret') ?: \App\Models\Setting::where('key', 'autogopay_secret')->value('value') ?: 'default_secret';
 
         // Validate HMAC-SHA256 signature
         $computedSignature = hash_hmac('sha256', $rawBody, $secret);

@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'autogopay' => [
+        'api_key' => env('AUTOGOPAY_API_KEY'),
+        'secret' => env('AUTOGOPAY_SECRET'),
+        'merchant_id' => env('AUTOGOPAY_MERCHANT_ID'),
+        'base_url' => env('AUTOGOPAY_BASE_URL', 'https://v1-gateway.autogopay.site'),
+    ],
+
 ];
