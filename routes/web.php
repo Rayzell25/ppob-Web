@@ -3,8 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 use Illuminate\Support\Facades\Auth;
-use App\Livewire\Storefront;
-Route::get('/', Storefront::class)->name('home');
+Route::get('/', \App\Livewire\Frontend\Home::class)->name('home');
 Route::get('/login', [App\Http\Controllers\AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [App\Http\Controllers\AuthController::class, 'login']);
 Route::get('/register', [App\Http\Controllers\AuthController::class, 'showRegisterForm'])->name('register');
