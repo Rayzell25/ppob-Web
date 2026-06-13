@@ -2,13 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 
-use App\Livewire\Storefront;
-use App\Livewire\AdminDashboard;
-
 use Illuminate\Support\Facades\Auth;
-
+use App\Livewire\Storefront;
 Route::get('/', Storefront::class)->name('home');
-Route::get('/admin', AdminDashboard::class)->name('admin.dashboard');
 Route::get('/login', [App\Http\Controllers\AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [App\Http\Controllers\AuthController::class, 'login']);
 Route::get('/register', [App\Http\Controllers\AuthController::class, 'showRegisterForm'])->name('register');
