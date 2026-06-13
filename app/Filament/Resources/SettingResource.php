@@ -41,14 +41,14 @@ class SettingResource extends Resource
                             TextInput::make('web_name')->label('Nama Web/Toko')->required(),
                             TextInput::make('admin_whatsapp')->label('WhatsApp Admin')->tel(),
                         ]),
-                        FileUpload::make('logo')
+                        /* FileUpload::make('logo')
                             ->label('Logo Web')
                             ->disk('public')
                             ->directory('logos')
                             ->visibility('public')
                             ->image()
                             ->maxSize(2048)
-                            ->columnSpanFull(),
+                            ->columnSpanFull(), */
                     ]),
 
                 Tabs\Tab::make('Markup Harga')
