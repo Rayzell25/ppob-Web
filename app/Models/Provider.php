@@ -15,6 +15,7 @@ class Provider extends Model
     protected $fillable = [
         'name',
         'code',
+        'type',
         'api_username',
         'api_key',
         'api_url',

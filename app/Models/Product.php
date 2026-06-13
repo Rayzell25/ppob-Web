@@ -78,4 +78,16 @@ class Product extends Model
     {
         return $this->hasMany(Transaction::class);
     }
+
+    /**
+     * Get the primary active provider route.
+     */
+    public function getActiveProvider()
+    {
+        return $this->providerRoutes()
+            ->with('provider')
+            ->where('is_active', true)
+            ->where('status', 'active')
+            ->first();
+    }
 }
