@@ -4,57 +4,41 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Exception;
 
 class WhatsAppService
 {
     /**
-     * Send a WhatsApp message via Fonnte.
+     * Send a WhatsApp message using Fonnte API.
      *
-     * @param string $target
-     * @param string $message
-     * @return array
-     * @throws Exception
+     * @param string $target  The recipient's phone number.
+     * @param string $message The message content.
+     * @return bool           True if successful, false otherwise.
      */
-    public function send(string $target, string $message): array
+    public static function send(string $target, string $message): bool
     {
-        $token = env('FONNTE_TOKEN') ?: config('services.fonnte.token');
-
-        if (!$token) {
-            Log::warning("WhatsApp notification skipped: FONNTE_TOKEN is not configured.");
-            return ['status' => false, 'reason' => 'Fonnte token not configured'];
-        }
-
         try {
-            Log::info("Sending WhatsApp message to [{$target}]...");
-
             $response = Http::withHeaders([
-                'Authorization' => $token
-            ])->asForm()->post('https://api.fonnte.com/send', [
+                'Authorization' => env('FONNTE_TOKEN'), // Get token from .env
+            ])->post('https://api.fonnte.com/send', [
                 'target' => $target,
                 'message' => $message,
+                // You can add 'delay' => '2' here if you are sending to multiple numbers to avoid bans
             ]);
 
-            if ($response->failed()) {
-                throw new Exception("Fonnte HTTP request failed: " . $response->status() . " - " . $response->body());
+            $responseData = $response->json();
+
+            // Check if Fonnte accepted the request
+            if ($response->successful() && isset($responseData['status']) && $responseData['status'] === true) {
+                 Log::info("WhatsApp sent successfully to {$target}. Response: " . json_encode($responseData));
+                 return true;
             }
 
-            $result = $response->json();
-            
-            // Fonnte returns {"status": true} on success
-            if (!($result['status'] ?? false)) {
-                throw new Exception("Fonnte API returned error: " . ($result['reason'] ?? $response->body()));
-            }
+            Log::error("Fonnte API returned an error for target {$target}: " . $response->body());
+            return false;
 
-            Log::info("WhatsApp message successfully sent to [{$target}]. Fonnte response: " . json_encode($result));
-
-            return [
-                'status' => true,
-                'data' => $result
-            ];
-        } catch (Exception $e) {
-            Log::error("Failed to send WhatsApp message to [{$target}]: " . $e->getMessage());
-            throw $e;
+        } catch (\Exception $e) {
+            Log::error("Exception occurred while sending WhatsApp to {$target}: " . $e->getMessage());
+            return false;
         }
     }
 }

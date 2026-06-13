@@ -12,18 +12,6 @@ class SendWhatsAppNotification implements ShouldQueue
 {
     use InteractsWithQueue;
 
-    protected WhatsAppService $whatsAppService;
-
-    /**
-     * Create the event listener.
-     *
-     * @param WhatsAppService $whatsAppService
-     */
-    public function __construct(WhatsAppService $whatsAppService)
-    {
-        $this->whatsAppService = $whatsAppService;
-    }
-
     /**
      * Handle the event.
      *
@@ -50,10 +38,6 @@ class SendWhatsAppNotification implements ShouldQueue
 
         $message = "Halo {$name}, transaksi {$product} Anda status: {$status}. SN: {$sn}. Terima kasih!";
 
-        try {
-            $this->whatsAppService->send($target, $message);
-        } catch (\Exception $e) {
-            Log::error("Failed to send WhatsApp notification in event listener: " . $e->getMessage());
-        }
+        WhatsAppService::send($target, $message);
     }
 }
