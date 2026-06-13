@@ -93,17 +93,15 @@ class TransactionController extends Controller
                 ]);
             });
 
-            // Process order via cascading provider router
-            $this->providerRouterService->processOrder($transaction);
+            // Process order via queue job asynchronously
+            \App\Jobs\ProcessTransactionOrder::dispatch($transaction);
 
             // Fresh load updated status, cost price, message, etc.
             $transaction->refresh();
 
             return response()->json([
                 'success' => true,
-                'message' => $transaction->status === 'success' 
-                    ? 'Transaction successful.' 
-                    : ($transaction->status === 'failed' ? 'Transaction failed: ' . $transaction->message : 'Transaction is pending.'),
+                'message' => 'Transaction has been queued for processing.',
                 'data' => $transaction
             ], 201);
         } catch (Exception $e) {

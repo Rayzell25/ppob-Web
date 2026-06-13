@@ -8,6 +8,7 @@ use App\Services\Providers\DigiflazzGateway;
 use App\Services\Providers\KmspGateway;
 use App\Services\Providers\GenericGateway;
 use App\Events\TransactionCompleted;
+use Illuminate\Support\Facades\Log;
 use Exception;
 
 class ProviderRouterService
@@ -37,9 +38,12 @@ class ProviderRouterService
      */
     public function processOrder(Transaction $transaction): bool
     {
+        Log::info("Starting cascading provider routing for transaction [{$transaction->reference_id}].");
+
         $product = $transaction->product;
 
         if (!$product) {
+            Log::error("Transaction [{$transaction->reference_id}] failed: Product not found.");
             $transaction->update([
                 'status' => 'failed',
                 'message' => 'Product not found.',
@@ -55,6 +59,7 @@ class ProviderRouterService
             ->get();
 
         if ($routes->isEmpty()) {
+            Log::warning("Transaction [{$transaction->reference_id}] failed: No active provider routes configured for SKU [{$product->sku}].");
             $transaction->update([
                 'status' => 'failed',
                 'message' => 'No active provider routes configured for this product.',
@@ -65,10 +70,13 @@ class ProviderRouterService
         foreach ($routes as $route) {
             $provider = $route->provider;
             if (!$provider || !$provider->is_active) {
+                Log::info("Skipping inactive provider [" . ($provider->name ?? 'Unknown') . "] for transaction [{$transaction->reference_id}].");
                 continue;
             }
 
             try {
+                Log::info("Attempting transaction [{$transaction->reference_id}] via provider [{$provider->name}] (SKU: {$route->provider_sku}, Priority: {$route->priority}).");
+
                 // Update transaction with current provider attempt
                 $transaction->update([
                     'provider_id' => $provider->id,
@@ -80,6 +88,8 @@ class ProviderRouterService
 
                 // Call gateway
                 $result = $gateway->sendOrder($transaction, $route);
+
+                Log::info("Transaction [{$transaction->reference_id}] successfully completed via provider [{$provider->name}]. SN: " . ($result['sn'] ?? 'N/A'));
 
                 // Successfully processed
                 $transaction->update([
@@ -93,6 +103,8 @@ class ProviderRouterService
 
                 return true;
             } catch (Exception $e) {
+                Log::error("Failed attempt for transaction [{$transaction->reference_id}] on provider [{$provider->name}]: " . $e->getMessage());
+
                 // Record the failed attempt
                 $attempts = $transaction->routing_attempts ?? [];
                 $attempts[] = [
@@ -112,6 +124,8 @@ class ProviderRouterService
             }
         }
 
+        Log::critical("All provider routes failed for transaction [{$transaction->reference_id}]. Refunding sell price [Rp {$transaction->sell_price}] to user.");
+
         // If we reach here, all routing attempts failed
         $transaction->update([
             'status' => 'failed',
@@ -122,6 +136,7 @@ class ProviderRouterService
         $user = $transaction->user;
         if ($user) {
             $user->increment('balance', $transaction->sell_price);
+            Log::info("User [ID: {$user->id}] refunded successfully.");
         }
 
         return false;

@@ -176,6 +176,9 @@ $response = $app->handle($request);
 echo "Response Status: " . $response->getStatusCode() . "\n";
 echo "Response Body: " . $response->getContent() . "\n";
 
+// Process queued jobs
+\Illuminate\Support\Facades\Artisan::call('queue:work', ['--once' => true]);
+
 printDBState();
 
 // -------------------------------------------------------------
@@ -211,6 +214,9 @@ $webhookRequest = Request::create('/api/webhook/autogopay', 'POST', [], [], [], 
 $webhookResponse = $app->handle($webhookRequest);
 echo "Webhook Response Status: " . $webhookResponse->getStatusCode() . "\n";
 echo "Webhook Response Body: " . $webhookResponse->getContent() . "\n";
+
+// Process queued jobs
+\Illuminate\Support\Facades\Artisan::call('queue:work', ['--once' => true]);
 
 printDBState();
 
@@ -266,5 +272,8 @@ $request = Request::create('/api/transactions', 'POST', [
 $response = $app->handle($request);
 echo "Failover Response Status: " . $response->getStatusCode() . "\n";
 echo "Failover Response Body: " . $response->getContent() . "\n";
+
+// Process queued jobs
+\Illuminate\Support\Facades\Artisan::call('queue:work', ['--once' => true]);
 
 printDBState();

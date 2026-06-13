@@ -78,15 +78,15 @@ class WebhookController extends Controller
             // Update status to 'paid'
             $transaction->update([
                 'status' => 'paid',
-                'message' => 'Payment settled via AutoGoPay. Routing to provider gateway...'
+                'message' => 'Payment settled via AutoGoPay. Order queued for routing...'
             ]);
 
-            // Process order with provider failover routing
-            $this->providerRouterService->processOrder($transaction);
+            // Process order asynchronously via queue worker
+            \App\Jobs\ProcessTransactionOrder::dispatch($transaction);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Webhook processed and order routed.'
+                'message' => 'Webhook processed and order queued.'
             ]);
         }
 
