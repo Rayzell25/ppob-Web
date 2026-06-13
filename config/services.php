@@ -46,4 +46,16 @@ return [
         'token' => env('FONNTE_TOKEN'),
     ],
 
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI'),
+    ],
+
+    'telegram' => [
+        'client_id' => env('TELEGRAM_CLIENT_ID'),
+        'client_secret' => env('TELEGRAM_CLIENT_SECRET'),
+        'redirect' => env('TELEGRAM_REDIRECT_URI'),
+    ],
+
 ];

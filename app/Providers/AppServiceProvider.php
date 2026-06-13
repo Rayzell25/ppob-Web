@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Event;
 use App\Events\TransactionCompleted;
 use App\Listeners\SendWhatsAppNotification;
+use SocialiteProviders\Manager\SocialiteWasCalled;
+use SocialiteProviders\Telegram\TelegramExtendSocialite;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -33,5 +35,9 @@ class AppServiceProvider extends ServiceProvider
             TransactionCompleted::class,
             SendWhatsAppNotification::class
         );
+
+        Event::listen(function (SocialiteWasCalled $event) {
+            $event->extendSocialite('telegram', TelegramExtendSocialite::class);
+        });
     }
 }
