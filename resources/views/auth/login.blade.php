@@ -56,6 +56,7 @@
                 <div class="space-y-1.5">
                     <div class="flex justify-between items-center">
                         <label for="password" class="text-xs font-bold text-slate-400 uppercase tracking-wide">Kata Sandi</label>
+                        <a href="/forgot-password" class="text-[10px] font-semibold text-blue-400 hover:text-blue-300 transition">Lupa Kata Sandi?</a>
                     </div>
                     <input type="password" id="password" name="password" required
                         class="w-full bg-slate-950 border border-slate-700 hover:border-slate-600 focus:border-indigo-500 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none transition" 
