@@ -59,11 +59,19 @@ class User extends Authenticatable implements \Filament\Models\Contracts\Filamen
     }
 
     /**
-     * Get the transactions for the user.
+     * Get the PPOB transactions for the user.
      */
     public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class);
+    }
+
+    /**
+     * Get the wallet ledger transactions for the user (reseller top-up/deductions).
+     */
+    public function walletTransactions(): HasMany
+    {
+        return $this->hasMany(WalletTransaction::class);
     }
 
     /**
