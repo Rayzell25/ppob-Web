@@ -18,7 +18,9 @@ class Provider extends Model
         'type',
         'api_username',
         'api_key',
+        'secret_key',
         'api_url',
+        'base_url',
         'balance',
         'is_active',
     ];
@@ -50,5 +52,21 @@ class Provider extends Model
     public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class);
+    }
+
+    /**
+     * Get the products directly assigned to this provider.
+     */
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class);
+    }
+
+    /**
+     * Get the categories that default to this provider.
+     */
+    public function categories(): HasMany
+    {
+        return $this->hasMany(Category::class, 'default_provider_id');
     }
 }

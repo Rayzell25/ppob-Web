@@ -30,6 +30,13 @@ class CategoryResource extends Resource
                     ->required()
                     ->unique(ignoreRecord: true)
                     ->maxLength(255),
+                Forms\Components\Select::make('default_provider_id')
+                    ->relationship('defaultProvider', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->nullable()
+                    ->label('Default API Provider (Opsional)')
+                    ->helperText('API Provider default untuk semua produk dalam kategori ini. Produk bisa override secara individual.'),
                 Forms\Components\TextInput::make('member_markup')
                     ->numeric()
                     ->nullable()

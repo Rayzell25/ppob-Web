@@ -39,13 +39,29 @@ class ProductResource extends Resource
                     ->searchable()
                     ->preload()
                     ->required(),
-                Forms\Components\Select::make('provider')
-                    ->options([
-                        'digiflazz' => 'Digiflazz',
-                        'kmsp' => 'KMSP',
-                        'vip' => 'VIP Reseller',
-                    ])
-                    ->required(),
+                Forms\Components\Select::make('provider_id')
+                    ->relationship('provider', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->nullable()
+                    ->label('Ambil dari API Mana? (Override Kategori)')
+                    ->helperText('Kosongkan untuk menggunakan Default Provider dari Kategori')
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('name')
+                            ->label('Nama Profil API')
+                            ->required(),
+                        Forms\Components\TextInput::make('code')
+                            ->label('Kode Unik')
+                            ->required(),
+                        Forms\Components\Select::make('type')
+                            ->label('Jenis API')
+                            ->options(\App\Filament\Resources\ProviderResource::typeOptions())
+                            ->required(),
+                        Forms\Components\TextInput::make('api_key')
+                            ->label('API Key'),
+                        Forms\Components\TextInput::make('secret_key')
+                            ->label('Secret Key'),
+                    ]),
                 Forms\Components\TextInput::make('product_code')
                     ->required()
                     ->unique(ignoreRecord: true)
@@ -59,9 +75,15 @@ class ProductResource extends Resource
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('base_price')
+                    ->label('Harga Modal (Base Price)')
                     ->numeric()
                     ->default(0)
                     ->required(),
+                Forms\Components\TextInput::make('provider_server_price')
+                    ->label('Harga Modal dari Server API (Info Otomatis)')
+                    ->numeric()
+                    ->disabled()
+                    ->helperText('Diisi otomatis saat sinkronisasi harga dari API provider'),
                 Forms\Components\TextInput::make('member_markup')
                     ->numeric()
                     ->nullable()
@@ -91,19 +113,23 @@ class ProductResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('category.name')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('brand.name')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('provider')
+                Tables\Columns\TextColumn::make('provider.name')
+                    ->label('API Provider')
+                    ->badge()
+                    ->placeholder('— (via Kategori)')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('base_price')
-                    ->numeric()
+                    ->label('Base Price')
+                    ->money('IDR')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('member_markup')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('reseller_markup')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\IconColumn::make('is_active')
                     ->boolean()
                     ->sortable(),

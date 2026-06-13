@@ -17,12 +17,13 @@ class Product extends Model
     protected $fillable = [
         'category_id',
         'brand_id',
-        'provider',
+        'provider_id',
         'product_code',
         'name',
         'sku',
         'description',
         'base_price',
+        'provider_server_price',
         'price',
         'member_markup',
         'reseller_markup',
@@ -41,6 +42,7 @@ class Product extends Model
         return [
             'price' => 'integer',
             'base_price' => 'decimal:2',
+            'provider_server_price' => 'decimal:2',
             'member_markup' => 'decimal:2',
             'reseller_markup' => 'decimal:2',
             'is_active' => 'boolean',
@@ -78,6 +80,14 @@ class Product extends Model
     public function brand(): BelongsTo
     {
         return $this->belongsTo(Brand::class);
+    }
+
+    /**
+     * Get the direct API provider assigned to this product (overrides category default).
+     */
+    public function provider(): BelongsTo
+    {
+        return $this->belongsTo(Provider::class);
     }
 
     /**

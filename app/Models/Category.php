@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Category extends Model
@@ -15,6 +16,7 @@ class Category extends Model
     protected $fillable = [
         'name',
         'slug',
+        'default_provider_id',
         'member_markup',
         'reseller_markup',
         'icon',
@@ -47,5 +49,13 @@ class Category extends Model
     public function products(): HasMany
     {
         return $this->hasMany(Product::class);
+    }
+
+    /**
+     * Get the default API provider for this category.
+     */
+    public function defaultProvider(): BelongsTo
+    {
+        return $this->belongsTo(Provider::class, 'default_provider_id');
     }
 }
