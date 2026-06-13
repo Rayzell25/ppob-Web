@@ -1,8 +1,14 @@
 <nav class="sticky top-0 z-50 bg-white dark:bg-slate-800 border-b border-gray-100 dark:border-slate-700 shadow-sm transition-colors duration-300">
-    <div class="px-4 py-3 flex justify-between items-center">
-        <!-- Logo / Nama Web -->
-        <a href="/" class="text-xl font-bold text-blue-600 dark:text-blue-400">
-            {{ \App\Models\Setting::where('key', 'store_name')->value('value') ?? \App\Models\Setting::where('key', 'web_name')->value('value') ?? 'Rayzell Store' }}
+    <div class="px-4 py-3 flex justify-between items-center container mx-auto max-w-7xl">
+        <a href="/" class="flex items-center space-x-3 text-xl font-bold text-blue-600 dark:text-blue-400">
+            @php 
+                $logo = \App\Models\Setting::where('key', 'logo')->value('value'); 
+                $webName = \App\Models\Setting::where('key', 'web_name')->value('value') ?? \App\Models\Setting::where('key', 'store_name')->value('value') ?? 'Rayzell Store'; 
+            @endphp
+            @if($logo)
+                <img src="{{ asset('storage/'.$logo) }}" alt="{{ $webName }}" class="h-8 md:h-10 w-auto rounded object-contain">
+            @endif
+            <span class="{{ $logo ? 'hidden sm:block' : '' }}">{{ $webName }}</span>
         </a>
 
         <!-- Menu Kanan: Switcher & Tombol Login -->
