@@ -158,6 +158,13 @@ Http::fake(function ($request) {
         ], 200);
     }
     
+    if (str_contains($request->url(), 'api.fonnte.com')) {
+        return Http::response([
+            'status' => true,
+            'reason' => 'Mocked success response'
+        ], 200);
+    }
+    
     return Http::response([], 404);
 });
 

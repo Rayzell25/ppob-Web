@@ -42,4 +42,8 @@ return [
         'base_url' => env('AUTOGOPAY_BASE_URL', 'https://v1-gateway.autogopay.site'),
     ],
 
+    'fonnte' => [
+        'token' => env('FONNTE_TOKEN'),
+    ],
+
 ];

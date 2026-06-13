@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\TransactionController;
 use App\Http\Controllers\Api\WebhookController;
+use App\Http\Controllers\Api\AuthController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -19,3 +20,7 @@ Route::middleware('throttle:api')->group(function () {
 // Webhook & Callback Routes
 Route::post('/webhook/autogopay', [WebhookController::class, 'handleAutoGoPay']);
 Route::post('/webhook/callback/{provider}', [WebhookController::class, 'handleProviderCallback']);
+
+// Auth OTP Routes
+Route::post('/auth/send-otp', [AuthController::class, 'sendOtp']);
+Route::post('/auth/verify-otp', [AuthController::class, 'verifyOtp']);
