@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Masuk - {{ \App\Models\Setting::where('key', 'store_name')->value('value') ?? 'Rayzell Store' }}</title>
+    <title>Daftar Akun - {{ \App\Models\Setting::where('key', 'store_name')->value('value') ?? 'Rayzell Store' }}</title>
     
     <!-- Google Fonts - Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,14 +28,14 @@
             <h1 class="text-3xl font-extrabold bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500 bg-clip-text text-transparent tracking-tight">
                 {{ \App\Models\Setting::where('key', 'store_name')->value('value') ?? 'Rayzell Store' }}
             </h1>
-            <p class="text-xs text-slate-400 mt-1.5">Selamat datang kembali! Silakan masuk ke akun Anda.</p>
+            <p class="text-xs text-slate-400 mt-1.5">Daftar Akun Baru</p>
         </div>
 
         <!-- Card Form -->
         <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-2xl relative overflow-hidden">
             <div class="absolute -right-20 -top-20 w-40 h-40 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
             
-            <form method="POST" action="/login" class="space-y-4 relative z-10">
+            <form method="POST" action="/register" class="space-y-4 relative z-10">
                 @csrf
                 
                 @if ($errors->any())
@@ -44,38 +44,54 @@
                     </div>
                 @endif
 
-                <!-- Email / WhatsApp Input -->
+                <!-- Name Input -->
                 <div class="space-y-1.5">
-                    <label for="login_id" class="text-xs font-bold text-slate-400 uppercase tracking-wide">Email / No. WhatsApp</label>
-                    <input type="text" id="login_id" name="login_id" value="{{ old('login_id') }}" required autofocus
+                    <label for="name" class="text-xs font-bold text-slate-400 uppercase tracking-wide">Nama Lengkap</label>
+                    <input type="text" id="name" name="name" value="{{ old('name') }}" required autofocus
                         class="w-full bg-slate-950 border border-slate-700 hover:border-slate-600 focus:border-indigo-500 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none transition" 
-                        placeholder="Email atau nomor WhatsApp..." />
+                        placeholder="Nama lengkap Anda..." />
+                </div>
+
+                <!-- Email Input -->
+                <div class="space-y-1.5">
+                    <label for="email" class="text-xs font-bold text-slate-400 uppercase tracking-wide">Alamat Email</label>
+                    <input type="email" id="email" name="email" value="{{ old('email') }}" required
+                        class="w-full bg-slate-950 border border-slate-700 hover:border-slate-600 focus:border-indigo-500 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none transition" 
+                        placeholder="nama@email.com" />
+                </div>
+
+                <!-- Phone Input -->
+                <div class="space-y-1.5">
+                    <label for="phone" class="text-xs font-bold text-slate-400 uppercase tracking-wide">No. WhatsApp (Aktif)</label>
+                    <input type="text" id="phone" name="phone" value="{{ old('phone') }}" required
+                        class="w-full bg-slate-950 border border-slate-700 hover:border-slate-600 focus:border-indigo-500 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none transition" 
+                        placeholder="e.g. 08123456789" />
                 </div>
 
                 <!-- Password Input -->
                 <div class="space-y-1.5">
-                    <div class="flex justify-between items-center">
-                        <label for="password" class="text-xs font-bold text-slate-400 uppercase tracking-wide">Kata Sandi</label>
-                    </div>
+                    <label for="password" class="text-xs font-bold text-slate-400 uppercase tracking-wide">Kata Sandi</label>
                     <input type="password" id="password" name="password" required
                         class="w-full bg-slate-950 border border-slate-700 hover:border-slate-600 focus:border-indigo-500 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none transition" 
                         placeholder="••••••••" />
                 </div>
 
-                <!-- Remember me -->
-                <div class="flex items-center">
-                    <input type="checkbox" id="remember" name="remember" class="bg-slate-950 border border-slate-700 rounded focus:ring-0 focus:ring-offset-0 text-indigo-600 h-4 w-4" />
-                    <label for="remember" class="ml-2 text-xs font-semibold text-slate-400 cursor-pointer">Ingat saya di perangkat ini</label>
+                <!-- Password Confirmation Input -->
+                <div class="space-y-1.5">
+                    <label for="password_confirmation" class="text-xs font-bold text-slate-400 uppercase tracking-wide">Konfirmasi Kata Sandi</label>
+                    <input type="password" id="password_confirmation" name="password_confirmation" required
+                        class="w-full bg-slate-950 border border-slate-700 hover:border-slate-600 focus:border-indigo-500 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none transition" 
+                        placeholder="••••••••" />
                 </div>
 
                 <!-- Submit Button -->
                 <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm py-3 rounded-xl shadow-lg shadow-indigo-600/10 hover:shadow-indigo-600/35 transition-all duration-200 mt-2">
-                    Masuk Sekarang
+                    Daftar Sekarang
                 </button>
                 
                 <div class="text-center mt-4">
                     <p class="text-xs text-slate-400">
-                        Belum punya akun? <a href="/register" class="text-blue-400 hover:text-blue-300 font-semibold transition">Daftar di sini</a>
+                        Sudah punya akun? <a href="/login" class="text-blue-400 hover:text-blue-300 font-semibold transition">Masuk di sini</a>
                     </p>
                 </div>
             </form>
