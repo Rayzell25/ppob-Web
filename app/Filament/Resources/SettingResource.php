@@ -38,6 +38,16 @@ class SettingResource extends Resource
                             ->image()
                             ->directory('settings')
                             ->required(),
+                        Forms\Components\TextInput::make('default_member_markup')
+                            ->label('Default Member Markup')
+                            ->numeric()
+                            ->default(2000)
+                            ->required(),
+                        Forms\Components\TextInput::make('default_reseller_markup')
+                            ->label('Default Reseller Markup')
+                            ->numeric()
+                            ->default(1000)
+                            ->required(),
                     ])
             ]);
     }

@@ -24,6 +24,8 @@ class EditSetting extends EditRecord
         $data['store_name'] = \App\Models\Setting::where('key', 'store_name')->value('value') ?? 'Rayzell Store';
         $data['whatsapp_link'] = \App\Models\Setting::where('key', 'whatsapp_link')->value('value') ?? '';
         $data['logo'] = \App\Models\Setting::where('key', 'logo')->value('value') ?? '';
+        $data['default_member_markup'] = \App\Models\Setting::where('key', 'default_member_markup')->value('value') ?? 2000;
+        $data['default_reseller_markup'] = \App\Models\Setting::where('key', 'default_reseller_markup')->value('value') ?? 1000;
         return $data;
     }
 
@@ -32,6 +34,8 @@ class EditSetting extends EditRecord
         \App\Models\Setting::updateOrCreate(['key' => 'store_name'], ['value' => $data['store_name']]);
         \App\Models\Setting::updateOrCreate(['key' => 'whatsapp_link'], ['value' => $data['whatsapp_link']]);
         \App\Models\Setting::updateOrCreate(['key' => 'logo'], ['value' => $data['logo']]);
+        \App\Models\Setting::updateOrCreate(['key' => 'default_member_markup'], ['value' => $data['default_member_markup']]);
+        \App\Models\Setting::updateOrCreate(['key' => 'default_reseller_markup'], ['value' => $data['default_reseller_markup']]);
 
         $data['value'] = 'site_settings';
         return $data;

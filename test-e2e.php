@@ -74,8 +74,11 @@ $brand = Brand::create(['category_id' => $category->id, 'name' => 'Telkomsel', '
 $product = Product::create([
     'category_id' => $category->id,
     'brand_id' => $brand->id,
+    'provider' => 'digiflazz',
+    'product_code' => 'T10K',
     'name' => 'Telkomsel 10K',
     'sku' => 'T10K',
+    'base_price' => 9000,
     'price' => 11000,
     'type' => 'pulsa',
     'status' => 'active',

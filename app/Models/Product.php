@@ -17,12 +17,18 @@ class Product extends Model
     protected $fillable = [
         'category_id',
         'brand_id',
+        'provider',
+        'product_code',
         'name',
         'sku',
         'description',
+        'base_price',
         'price',
+        'member_markup',
+        'reseller_markup',
         'type',
         'status',
+        'is_active',
     ];
 
     /**
@@ -34,7 +40,28 @@ class Product extends Model
     {
         return [
             'price' => 'integer',
+            'base_price' => 'decimal:2',
+            'member_markup' => 'decimal:2',
+            'reseller_markup' => 'decimal:2',
+            'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * Calculate the final price based on hierarchical markups.
+     *
+     * @param string $role
+     * @return float
+     */
+    public function getFinalPrice($role = 'member')
+    {
+        $setting = \App\Models\Setting::pluck('value', 'key');
+        if ($role === 'reseller') {
+            $markup = $this->reseller_markup ?? $this->category->reseller_markup ?? ($setting['default_reseller_markup'] ?? 1000);
+        } else {
+            $markup = $this->member_markup ?? $this->category->member_markup ?? ($setting['default_member_markup'] ?? 2000);
+        }
+        return $this->base_price + $markup;
     }
 
     /**

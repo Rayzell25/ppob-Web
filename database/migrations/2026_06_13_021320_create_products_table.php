@@ -15,12 +15,18 @@ return new class extends Migration
             $table->id();
             $table->foreignId('category_id')->constrained()->cascadeOnDelete();
             $table->foreignId('brand_id')->constrained()->cascadeOnDelete();
+            $table->string('provider');
+            $table->string('product_code')->unique();
             $table->string('name');
             $table->string('sku')->unique();
             $table->text('description')->nullable();
+            $table->decimal('base_price', 12, 2)->default(0);
             $table->bigInteger('price')->default(0); // Selling price (cost + markup)
+            $table->decimal('member_markup', 12, 2)->nullable();
+            $table->decimal('reseller_markup', 12, 2)->nullable();
             $table->string('type')->default('prepaid'); // prepaid, postpaid
             $table->string('status')->default('active'); // active, inactive, gangguan
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }
