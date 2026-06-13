@@ -36,5 +36,12 @@ class Setting extends Model
         'key',
         'value',
         'group',
+        'popup_active',
+        'popup_title',
+        'popup_image',
+        'popup_text',
+        'popup_button_text',
+        'popup_button_color',
+        'popup_button_bg_color',
     ];
 }

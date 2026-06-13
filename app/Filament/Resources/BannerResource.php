@@ -35,7 +35,8 @@ class BannerResource extends Resource
                     ->required(),
                 Forms\Components\TextInput::make('order')
                     ->numeric()
-                    ->default(0)
+                    ->label('Urutan Slide (Ketik 1, 2, 3, dst)')
+                    ->default(1)
                     ->required(),
             ]);
     }
@@ -44,7 +45,8 @@ class BannerResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\ImageColumn::make('image_path'),
+                Tables\Columns\ImageColumn::make('image_path')
+                    ->label('Preview Banner'),
                 Tables\Columns\TextColumn::make('title')
                     ->searchable()
                     ->sortable(),
@@ -52,13 +54,14 @@ class BannerResource extends Resource
                     ->boolean()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('order')
-                    ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->label('Urutan Slide'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('order', 'asc')
             ->filters([
                 //
             ])

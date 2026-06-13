@@ -108,8 +108,13 @@ class Storefront extends Component
             $query->where('status', 'active');
         }])->get();
 
+        $settings = \App\Models\Setting::pluck('value', 'key')->toArray();
+        $banners = \App\Models\Banner::where('is_active', true)->orderBy('order', 'asc')->get();
+
         return view('livewire.storefront', [
-            'categories' => $categories
+            'categories' => $categories,
+            'settings' => $settings,
+            'banners' => $banners,
         ])->layout('components.layouts.app', ['title' => 'Storefront PPOB']);
     }
 }

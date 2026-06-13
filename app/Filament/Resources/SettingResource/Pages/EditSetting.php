@@ -21,21 +21,40 @@ class EditSetting extends EditRecord
 
     protected function mutateFormDataBeforeFill(array $data): array
     {
-        $data['store_name'] = \App\Models\Setting::where('key', 'store_name')->value('value') ?? 'Rayzell Store';
-        $data['whatsapp_link'] = \App\Models\Setting::where('key', 'whatsapp_link')->value('value') ?? '';
+        $data['web_name'] = \App\Models\Setting::where('key', 'store_name')->value('value') ?? \App\Models\Setting::where('key', 'web_name')->value('value') ?? 'Rayzell Store';
+        $data['admin_whatsapp'] = \App\Models\Setting::where('key', 'whatsapp_link')->value('value') ?? \App\Models\Setting::where('key', 'admin_whatsapp')->value('value') ?? '';
         $data['logo'] = \App\Models\Setting::where('key', 'logo')->value('value') ?? '';
         $data['default_member_markup'] = \App\Models\Setting::where('key', 'default_member_markup')->value('value') ?? 2000;
         $data['default_reseller_markup'] = \App\Models\Setting::where('key', 'default_reseller_markup')->value('value') ?? 1000;
+        
+        $data['popup_active'] = $data['popup_active'] ?? (bool)(\App\Models\Setting::where('key', 'popup_active')->value('value') ?? false);
+        $data['popup_title'] = $data['popup_title'] ?? \App\Models\Setting::where('key', 'popup_title')->value('value') ?? '';
+        $data['popup_image'] = $data['popup_image'] ?? \App\Models\Setting::where('key', 'popup_image')->value('value') ?? '';
+        $data['popup_text'] = $data['popup_text'] ?? \App\Models\Setting::where('key', 'popup_text')->value('value') ?? '';
+        $data['popup_button_text'] = $data['popup_button_text'] ?? \App\Models\Setting::where('key', 'popup_button_text')->value('value') ?? '';
+        $data['popup_button_color'] = $data['popup_button_color'] ?? \App\Models\Setting::where('key', 'popup_button_color')->value('value') ?? '';
+        $data['popup_button_bg_color'] = $data['popup_button_bg_color'] ?? \App\Models\Setting::where('key', 'popup_button_bg_color')->value('value') ?? '';
+
         return $data;
     }
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        \App\Models\Setting::updateOrCreate(['key' => 'store_name'], ['value' => $data['store_name']]);
-        \App\Models\Setting::updateOrCreate(['key' => 'whatsapp_link'], ['value' => $data['whatsapp_link']]);
+        \App\Models\Setting::updateOrCreate(['key' => 'store_name'], ['value' => $data['web_name']]);
+        \App\Models\Setting::updateOrCreate(['key' => 'web_name'], ['value' => $data['web_name']]);
+        \App\Models\Setting::updateOrCreate(['key' => 'whatsapp_link'], ['value' => $data['admin_whatsapp']]);
+        \App\Models\Setting::updateOrCreate(['key' => 'admin_whatsapp'], ['value' => $data['admin_whatsapp']]);
         \App\Models\Setting::updateOrCreate(['key' => 'logo'], ['value' => $data['logo']]);
         \App\Models\Setting::updateOrCreate(['key' => 'default_member_markup'], ['value' => $data['default_member_markup']]);
         \App\Models\Setting::updateOrCreate(['key' => 'default_reseller_markup'], ['value' => $data['default_reseller_markup']]);
+        
+        \App\Models\Setting::updateOrCreate(['key' => 'popup_active'], ['value' => $data['popup_active'] ? '1' : '0']);
+        \App\Models\Setting::updateOrCreate(['key' => 'popup_title'], ['value' => $data['popup_title'] ?? '']);
+        \App\Models\Setting::updateOrCreate(['key' => 'popup_image'], ['value' => $data['popup_image'] ?? '']);
+        \App\Models\Setting::updateOrCreate(['key' => 'popup_text'], ['value' => $data['popup_text'] ?? '']);
+        \App\Models\Setting::updateOrCreate(['key' => 'popup_button_text'], ['value' => $data['popup_button_text'] ?? '']);
+        \App\Models\Setting::updateOrCreate(['key' => 'popup_button_color'], ['value' => $data['popup_button_color'] ?? '']);
+        \App\Models\Setting::updateOrCreate(['key' => 'popup_button_bg_color'], ['value' => $data['popup_button_bg_color'] ?? '']);
 
         $data['value'] = 'site_settings';
         return $data;
