@@ -81,4 +81,15 @@ class User extends Authenticatable implements \Filament\Models\Contracts\Filamen
     {
         return $this->role === 'admin';
     }
+
+    /**
+     * Send password reset notification via WhatsApp Fonnte API.
+     *
+     * @param string $token
+     * @return void
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new \App\Notifications\ResetPasswordWhatsApp($token));
+    }
 }

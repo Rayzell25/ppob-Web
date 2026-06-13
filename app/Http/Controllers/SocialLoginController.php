@@ -80,6 +80,7 @@ class SocialLoginController extends Controller
                 if (!$user) {
                     $user = User::create([
                         'name' => $socialUser->getName() ?: $socialUser->getNickname() ?: 'Telegram User',
+                        'email' => $socialUser->getEmail() ?? $socialUser->getId() . '@telegram.local',
                         'telegram_id' => $socialUser->getId(),
                         'telegram_username' => $socialUser->getNickname(),
                         'avatar_url' => $socialUser->getAvatar(),
