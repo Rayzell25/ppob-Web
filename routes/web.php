@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\Auth;
 
 Route::get('/', Storefront::class)->name('home');
 Route::get('/admin', AdminDashboard::class)->name('admin.dashboard');
-Route::get('/logout', function () {
+Route::get('/login', [App\Http\Controllers\AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [App\Http\Controllers\AuthController::class, 'login']);
+Route::any('/logout', function () {
     Auth::logout();
     request()->session()->invalidate();
     request()->session()->regenerateToken();
