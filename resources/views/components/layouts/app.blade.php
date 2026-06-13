@@ -23,7 +23,7 @@
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
 
     <!-- Header Navigation -->
-    <header class="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-md border-b border-slate-800">
+    <header class="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-md border-b border-slate-800" x-data="{ mobileMenuOpen: false }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <a href="/" class="flex items-center gap-2">
@@ -36,7 +36,8 @@
                 </span>
             </div>
             
-            <nav class="flex items-center gap-6">
+            <!-- Desktop Navigation menu -->
+            <nav class="hidden md:flex items-center gap-6">
                 <a href="/" class="text-sm font-medium text-slate-300 hover:text-white transition">Home</a>
                 @auth
                     <!-- Profile & Balance Dropdown -->
@@ -97,11 +98,55 @@
                     </a>
                 @endauth
             </nav>
+
+            <!-- Mobile Hamburger Button -->
+            <div class="flex md:hidden items-center">
+                <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-slate-400 hover:text-white focus:outline-none p-2 rounded-lg bg-slate-800/40 border border-slate-700/60 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="!mobileMenuOpen">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="mobileMenuOpen" style="display: none;">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div x-show="mobileMenuOpen" x-transition class="md:hidden border-t border-slate-850 bg-slate-900 px-4 py-4 space-y-3" style="display: none;">
+            <a href="/" class="block text-sm font-medium text-slate-300 hover:text-white transition py-1">Home</a>
+            @auth
+                <div class="pt-2 border-t border-slate-800 space-y-2">
+                    <div class="bg-slate-950/40 p-3 rounded-xl border border-slate-800/80 mb-2">
+                        <p class="text-[10px] uppercase tracking-wider font-semibold text-slate-500">Akun Anda</p>
+                        <p class="text-xs font-semibold text-slate-300 mt-1">{{ auth()->user()->name }}</p>
+                        <p class="text-xs font-extrabold text-emerald-400 mt-0.5">Rp {{ number_format(auth()->user()->balance, 0, ',', '.') }}</p>
+                    </div>
+                    @if(auth()->user()->role === 'admin')
+                        <a href="/admin" class="flex items-center gap-2 text-sm font-semibold text-indigo-455 hover:text-indigo-300 transition py-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+                            </svg>
+                            Panel Admin
+                        </a>
+                    @endif
+                    <a href="/logout" class="flex items-center gap-2 text-sm font-semibold text-rose-455 hover:text-rose-350 transition py-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                        </svg>
+                        Keluar
+                    </a>
+                </div>
+            @else
+                <a href="/login" class="block text-center text-sm font-medium bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl shadow-lg shadow-indigo-600/20 transition">
+                    Masuk
+                </a>
+            @endauth
         </div>
     </header>
 
     <!-- Main Content Area -->
-    <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+    <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {{ $slot }}
     </main>
 

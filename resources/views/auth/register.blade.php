@@ -19,7 +19,7 @@
         }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex items-center justify-center p-4 selection:bg-indigo-500 selection:text-white">
+<body class="bg-slate-900 text-slate-100 min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 selection:bg-indigo-500 selection:text-white">
 
     <div class="w-full max-w-md space-y-6">
         
@@ -32,7 +32,7 @@
         </div>
 
         <!-- Card Form -->
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-2xl relative overflow-hidden">
+        <div class="w-full max-w-md space-y-8 bg-slate-800 rounded-2xl p-8 border border-slate-700 shadow-2xl relative overflow-hidden">
             <div class="absolute -right-20 -top-20 w-40 h-40 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
             
             <form method="POST" action="/register" class="space-y-4 relative z-10">

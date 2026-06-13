@@ -46,7 +46,7 @@
                             <div class="h-[1px] flex-grow bg-slate-900"></div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                             @foreach($brand->products as $product)
                                 <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 hover:border-blue-500 hover:shadow-2xl hover:shadow-indigo-950/20 transition-all duration-305 flex flex-col justify-between group relative overflow-hidden">
                                     <div class="absolute -right-16 -top-16 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl group-hover:bg-indigo-500/10 transition-all duration-300"></div>
