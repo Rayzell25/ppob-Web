@@ -36,6 +36,7 @@ class Setting extends Model
         'key',
         'value',
         'group',
+        'logo',
         'default_member_markup',
         'default_reseller_markup',
         'popup_active',
