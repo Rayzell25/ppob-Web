@@ -49,7 +49,7 @@ class EditSetting extends EditRecord
         \App\Models\Setting::updateOrCreate(['key' => 'web_name'], ['value' => $data['web_name']]);
         \App\Models\Setting::updateOrCreate(['key' => 'whatsapp_link'], ['value' => $data['admin_whatsapp']]);
         \App\Models\Setting::updateOrCreate(['key' => 'admin_whatsapp'], ['value' => $data['admin_whatsapp']]);
-        \App\Models\Setting::updateOrCreate(['key' => 'logo'], ['value' => $data['logo']]);
+        \App\Models\Setting::updateOrCreate(['key' => 'logo'], ['value' => $data['logo'] ?? \App\Models\Setting::where('key', 'logo')->value('value') ?? '']);
         \App\Models\Setting::updateOrCreate(['key' => 'default_member_markup'], ['value' => $data['default_member_markup']]);
         \App\Models\Setting::updateOrCreate(['key' => 'default_reseller_markup'], ['value' => $data['default_reseller_markup']]);
         
