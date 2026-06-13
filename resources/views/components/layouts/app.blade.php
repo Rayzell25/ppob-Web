@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="{ theme: localStorage.getItem('theme') || 'light' }" x-init="$watch('theme', val => localStorage.setItem('theme', val))" :class="theme === 'dark' ? 'dark' : ''">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,7 +19,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900 font-sans antialiased min-h-screen flex flex-col selection:bg-blue-500 selection:text-white">
+<body class="font-sans antialiased bg-gray-100 dark:bg-slate-900 text-gray-900 dark:text-white transition-colors duration-300 min-h-screen flex flex-col selection:bg-blue-500 selection:text-white">
 
     <header>
         <!-- Navbar is rendered inside components directly -->
