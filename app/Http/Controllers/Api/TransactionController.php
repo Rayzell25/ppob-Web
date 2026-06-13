@@ -94,7 +94,7 @@ class TransactionController extends Controller
             });
 
             // Process order via queue job asynchronously
-            \App\Jobs\ProcessTransactionOrder::dispatch($transaction);
+            \App\Jobs\ProcessOrderJob::dispatch($transaction);
 
             // Fresh load updated status, cost price, message, etc.
             $transaction->refresh();

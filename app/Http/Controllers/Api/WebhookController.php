@@ -82,7 +82,7 @@ class WebhookController extends Controller
             ]);
 
             // Process order asynchronously via queue worker
-            \App\Jobs\ProcessTransactionOrder::dispatch($transaction);
+            \App\Jobs\ProcessOrderJob::dispatch($transaction);
 
             return response()->json([
                 'success' => true,
