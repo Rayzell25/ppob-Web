@@ -71,7 +71,12 @@
                 @csrf
                 
                 <input type="hidden" name="token" value="{{ $token }}" />
-                <input type="hidden" name="phone" value="{{ $phone }}" />
+                @if(isset($phone))
+                    <input type="hidden" name="phone" value="{{ $phone }}" />
+                @endif
+                @if(isset($email))
+                    <input type="hidden" name="email" value="{{ $email }}" />
+                @endif
 
                 @if ($errors->any())
                     <div class="bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 p-3 rounded-xl text-xs font-semibold">

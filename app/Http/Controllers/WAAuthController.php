@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Validation\ValidationException;
 
 class WAAuthController extends Controller
 {
@@ -20,67 +23,66 @@ class WAAuthController extends Controller
     }
 
     /**
-     * Send password reset link via WhatsApp Fonnte API.
+     * Send password reset link via WhatsApp Fonnte API or SMTP Email.
      */
     public function sendResetLink(Request $request)
     {
         $request->validate([
-            'phone' => 'required|string|exists:users,phone',
+            'identifier' => 'required|string',
         ]);
 
-        $token = Str::random(60);
+        $identifier = trim($request->identifier);
+        $user = null;
+        $mode = 'email';
 
-        // Save token to password_reset_tokens (using phone in the email primary key column)
-        DB::table('password_reset_tokens')->updateOrInsert(
-            ['email' => $request->phone],
-            [
-                'token' => $token,
-                'created_at' => now(),
-            ]
-        );
-
-        $resetUrl = url("/reset-password/{$token}?phone=" . urlencode($request->phone));
-        $message = "Halo! Seseorang meminta reset password untuk akun Rayzell Store Anda. Abaikan jika ini bukan Anda. Klik link berikut untuk membuat password baru: " . $resetUrl;
-
-        // Send WhatsApp message via Fonnte API
-        try {
-            $fonnteToken = env('FONNTE_TOKEN');
-            $curl = curl_init();
-
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://api.fonnte.com/send',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 30,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => array(
-                    'target' => $request->phone,
-                    'message' => $message,
-                ),
-                CURLOPT_HTTPHEADER => array(
-                    'Authorization: ' . $fonnteToken
-                ),
-            ));
-
-            $response = curl_exec($curl);
-            $err = curl_error($curl);
-            curl_close($curl);
-
-            if ($err) {
-                Log::error("Fonnte cURL Error: " . $err);
-                return back()->withErrors(['phone' => 'Gagal mengirim pesan WhatsApp. Silakan coba beberapa saat lagi.']);
+        if (str_contains($identifier, '@')) {
+            $user = User::where('email', $identifier)->first();
+            $mode = 'email';
+        } else {
+            // Clean non-numeric characters for phone numbers
+            $phone = preg_replace('/[^0-9]/', '', $identifier);
+            if (!empty($phone)) {
+                $user = User::where('phone', $phone)->first();
             }
-
-            Log::info("Fonnte Response: " . $response);
-        } catch (\Exception $e) {
-            Log::error("Fonnte Exception: " . $e->getMessage());
-            return back()->withErrors(['phone' => 'Gagal mengirim pesan WhatsApp: ' . $e->getMessage()]);
+            $mode = 'whatsapp';
         }
 
-        return back()->with('success', 'Link reset password telah dikirim ke nomor WhatsApp Anda.');
+        if (!$user) {
+            throw ValidationException::withMessages([
+                'identifier' => ['Akun dengan Email/Nomor WA tersebut tidak ditemukan.'],
+            ]);
+        }
+
+        // Generate reset token manually using Laravel's password broker (stores hashed token under email)
+        $token = Password::broker()->createToken($user);
+        
+        if ($mode === 'whatsapp') {
+            // Prepare reset link with phone parameter for custom reset form
+            $resetLink = url(route('password.reset', ['token' => $token, 'phone' => $user->phone], false));
+            $message = "Halo {$user->name}, klik link berikut untuk mereset kata sandi akun PPOB Anda:\n\n" . $resetLink;
+
+            try {
+                $response = Http::withHeaders([
+                    'Authorization' => env('FONNTE_TOKEN'),
+                ])->post('https://api.fonnte.com/send', [
+                    'target' => $user->phone,
+                    'message' => $message,
+                ]);
+
+                if ($response->failed()) {
+                    Log::error('Fonnte API WhatsApp send failed on reset request: ' . $response->body());
+                    return back()->withErrors(['identifier' => 'Gagal mengirim pesan WhatsApp via Fonnte.']);
+                }
+            } catch (\Exception $e) {
+                Log::error('Fonnte WhatsApp exception on reset request: ' . $e->getMessage());
+                return back()->withErrors(['identifier' => 'Terjadi kesalahan saat menghubungi layanan WhatsApp: ' . $e->getMessage()]);
+            }
+        } else {
+            // Send standard Laravel reset notification (SMTP email)
+            $user->sendPasswordResetNotification($token);
+        }
+
+        return back()->with('success', 'Link reset kata sandi telah dikirim ke Email / WhatsApp Anda.');
     }
 
     /**
@@ -91,6 +93,7 @@ class WAAuthController extends Controller
         return view('auth.reset-password', [
             'token' => $token,
             'phone' => $request->phone,
+            'email' => $request->email,
         ]);
     }
 
@@ -101,29 +104,48 @@ class WAAuthController extends Controller
     {
         $request->validate([
             'token' => 'required|string',
-            'phone' => 'required|string|exists:users,phone',
+            'phone' => 'nullable|string',
+            'email' => 'nullable|string',
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        $reset = DB::table('password_reset_tokens')
-            ->where('email', $request->phone)
-            ->where('token', $request->token)
+        $identifier = $request->phone ?? $request->email;
+        if (!$identifier) {
+            return back()->withErrors(['password' => 'Email atau nomor telepon tidak ditemukan.']);
+        }
+
+        // Find the user by phone or email
+        $user = User::where('phone', $identifier)
+            ->orWhere('email', $identifier)
             ->first();
 
-        if (!$reset) {
-            return back()->withErrors(['phone' => 'Token reset password tidak valid atau telah kedaluwarsa.']);
+        if (!$user) {
+            return back()->withErrors(['password' => 'Akun tidak ditemukan.']);
+        }
+
+        // Validate token using standard Laravel Password Broker
+        $isValid = Password::broker()->tokenExists($user, $request->token);
+
+        if (!$isValid) {
+            // Check if there is a legacy plain-text token stored under phone/email
+            $legacyReset = DB::table('password_reset_tokens')
+                ->where('email', $identifier)
+                ->where('token', $request->token)
+                ->first();
+
+            if (!$legacyReset) {
+                return back()->withErrors(['password' => 'Token reset password tidak valid atau telah kedaluwarsa.']);
+            }
         }
 
         // Update user's password
-        $user = User::where('phone', $request->phone)->first();
-        if ($user) {
-            $user->update([
-                'password' => Hash::make($request->password),
-            ]);
-        }
+        $user->update([
+            'password' => Hash::make($request->password),
+        ]);
 
         // Delete the token
-        DB::table('password_reset_tokens')->where('email', $request->phone)->delete();
+        Password::broker()->deleteToken($user);
+        DB::table('password_reset_tokens')->where('email', $identifier)->delete();
 
         return redirect('/login')->with('success', 'Password Anda berhasil diperbarui! Silakan masuk menggunakan password baru.');
     }

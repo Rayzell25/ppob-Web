@@ -82,19 +82,19 @@
                     </div>
                 @endif
 
-                <p class="text-xs text-gray-650 dark:text-gray-300 leading-relaxed mb-2">Masukkan nomor WhatsApp terdaftar Anda. Kami akan mengirimkan link untuk mengatur ulang kata sandi Anda melalui WhatsApp.</p>
+                <p class="text-xs text-gray-650 dark:text-gray-300 leading-relaxed mb-2">Masukkan alamat email atau nomor WhatsApp terdaftar Anda. Kami akan mengirimkan link untuk mengatur ulang kata sandi Anda.</p>
 
-                <!-- Phone Input -->
+                <!-- Identifier Input -->
                 <div class="space-y-1.5">
-                    <label for="phone" class="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide">Nomor WhatsApp</label>
-                    <input type="text" id="phone" name="phone" value="{{ old('phone') }}" required autofocus
+                    <label for="identifier" class="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide">Email / Nomor WhatsApp</label>
+                    <input type="text" id="identifier" name="identifier" value="{{ old('identifier') }}" required autofocus
                         class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 focus:border-indigo-500 rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none transition" 
-                        placeholder="Contoh: 08123456789" />
+                        placeholder="Contoh: nama@email.com atau 08123456789" />
                 </div>
 
                 <!-- Submit Button -->
                 <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm py-3 rounded-xl shadow-lg shadow-indigo-600/10 hover:shadow-indigo-600/35 transition-all duration-200 mt-2">
-                    Kirim Link Reset ke WhatsApp
+                    Kirim Link Reset
                 </button>
             </form>
         </div>
