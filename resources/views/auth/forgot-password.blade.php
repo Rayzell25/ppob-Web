@@ -57,10 +57,10 @@
         
         <!-- Logo / Title -->
         <div class="text-center">
-            <h1 class="text-3xl font-extrabold bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-600 dark:from-blue-400 dark:via-indigo-400 dark:to-purple-500 bg-clip-text text-transparent tracking-tight">
+            <h1 class="text-3xl font-bold text-blue-600 dark:text-blue-400 tracking-tight">
                 {{ \App\Models\Setting::where('key', 'store_name')->value('value') ?? \App\Models\Setting::where('key', 'web_name')->value('value') ?? 'Rayzell Store' }}
             </h1>
-            <p class="text-xs text-gray-500 dark:text-slate-400 mt-1.5">Lupa Kata Sandi Akun</p>
+            <p class="text-xs text-gray-600 dark:text-gray-300 mt-1.5">Lupa Kata Sandi Akun</p>
         </div>
 
         <!-- Card Form -->
@@ -82,13 +82,13 @@
                     </div>
                 @endif
 
-                <p class="text-xs text-gray-500 dark:text-slate-400 leading-relaxed mb-2">Masukkan nomor WhatsApp terdaftar Anda. Kami akan mengirimkan link untuk mengatur ulang kata sandi Anda melalui WhatsApp.</p>
+                <p class="text-xs text-gray-650 dark:text-gray-300 leading-relaxed mb-2">Masukkan nomor WhatsApp terdaftar Anda. Kami akan mengirimkan link untuk mengatur ulang kata sandi Anda melalui WhatsApp.</p>
 
                 <!-- Phone Input -->
                 <div class="space-y-1.5">
-                    <label for="phone" class="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wide">Nomor WhatsApp</label>
+                    <label for="phone" class="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide">Nomor WhatsApp</label>
                     <input type="text" id="phone" name="phone" value="{{ old('phone') }}" required autofocus
-                        class="w-full bg-gray-50 dark:bg-slate-950 border border-gray-300 dark:border-slate-700 hover:border-gray-400 dark:hover:border-slate-600 focus:border-indigo-500 rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none transition" 
+                        class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 focus:border-indigo-500 rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none transition" 
                         placeholder="Contoh: 08123456789" />
                 </div>
 
@@ -101,7 +101,7 @@
 
         <!-- Back Link -->
         <div class="text-center">
-            <a href="/login" class="text-xs text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-350 transition duration-200 inline-flex items-center justify-center gap-1.5">
+            <a href="/login" class="text-xs text-gray-500 dark:text-slate-400 hover:text-gray-750 dark:hover:text-slate-350 transition duration-200 inline-flex items-center justify-center gap-1.5">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                 </svg>

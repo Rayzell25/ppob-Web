@@ -57,10 +57,10 @@
         
         <!-- Logo / Title -->
         <div class="text-center">
-            <h1 class="text-3xl font-extrabold bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-600 dark:from-blue-400 dark:via-indigo-400 dark:to-purple-500 bg-clip-text text-transparent tracking-tight">
+            <h1 class="text-3xl font-bold text-blue-600 dark:text-blue-400 tracking-tight">
                 {{ \App\Models\Setting::where('key', 'store_name')->value('value') ?? \App\Models\Setting::where('key', 'web_name')->value('value') ?? 'Rayzell Store' }}
             </h1>
-            <p class="text-xs text-gray-500 dark:text-slate-400 mt-1.5">Reset Kata Sandi Akun</p>
+            <p class="text-xs text-gray-600 dark:text-gray-300 mt-1.5">Reset Kata Sandi Akun</p>
         </div>
 
         <!-- Card Form -->
@@ -79,21 +79,21 @@
                     </div>
                 @endif
 
-                <p class="text-xs text-gray-500 dark:text-slate-400 leading-relaxed mb-2">Silakan masukkan kata sandi baru Anda di bawah ini untuk mereset kata sandi akun Anda.</p>
+                <p class="text-xs text-gray-650 dark:text-gray-300 leading-relaxed mb-2">Silakan masukkan kata sandi baru Anda di bawah ini untuk mereset kata sandi akun Anda.</p>
 
                 <!-- Password Input -->
                 <div class="space-y-1.5">
-                    <label for="password" class="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wide">Kata Sandi Baru</label>
+                    <label for="password" class="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide">Kata Sandi Baru</label>
                     <input type="password" id="password" name="password" required autofocus
-                        class="w-full bg-gray-50 dark:bg-slate-950 border border-gray-300 dark:border-slate-700 hover:border-gray-400 dark:hover:border-slate-600 focus:border-indigo-500 rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none transition" 
+                        class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 focus:border-indigo-500 rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none transition" 
                         placeholder="••••••••" />
                 </div>
 
                 <!-- Password Confirmation Input -->
                 <div class="space-y-1.5">
-                    <label for="password_confirmation" class="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wide">Konfirmasi Kata Sandi Baru</label>
+                    <label for="password_confirmation" class="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide">Konfirmasi Kata Sandi Baru</label>
                     <input type="password" id="password_confirmation" name="password_confirmation" required
-                        class="w-full bg-gray-50 dark:bg-slate-950 border border-gray-300 dark:border-slate-700 hover:border-gray-400 dark:hover:border-slate-600 focus:border-indigo-500 rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none transition" 
+                        class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 focus:border-indigo-500 rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none transition" 
                         placeholder="••••••••" />
                 </div>
 
