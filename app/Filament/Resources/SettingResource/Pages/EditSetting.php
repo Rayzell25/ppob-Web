@@ -23,7 +23,7 @@ class EditSetting extends EditRecord
     {
         $data['web_name'] = \App\Models\Setting::where('key', 'store_name')->value('value') ?? \App\Models\Setting::where('key', 'web_name')->value('value') ?? 'Rayzell Store';
         $data['admin_whatsapp'] = \App\Models\Setting::where('key', 'whatsapp_link')->value('value') ?? \App\Models\Setting::where('key', 'admin_whatsapp')->value('value') ?? '';
-        $data['logo'] = \App\Models\Setting::where('key', 'logo')->value('value') ?? '';
+        $data['logo'] = \App\Models\Setting::where('key', 'logo')->value('value') ?: null;
         $data['default_member_markup'] = \App\Models\Setting::where('key', 'default_member_markup')->value('value') ?? 2000;
         $data['default_reseller_markup'] = \App\Models\Setting::where('key', 'default_reseller_markup')->value('value') ?? 1000;
         
@@ -49,7 +49,9 @@ class EditSetting extends EditRecord
         \App\Models\Setting::updateOrCreate(['key' => 'web_name'], ['value' => $data['web_name']]);
         \App\Models\Setting::updateOrCreate(['key' => 'whatsapp_link'], ['value' => $data['admin_whatsapp']]);
         \App\Models\Setting::updateOrCreate(['key' => 'admin_whatsapp'], ['value' => $data['admin_whatsapp']]);
-        \App\Models\Setting::updateOrCreate(['key' => 'logo'], ['value' => $data['logo'] ?? \App\Models\Setting::where('key', 'logo')->value('value') ?? '']);
+        if (array_key_exists('logo', $data)) {
+            \App\Models\Setting::updateOrCreate(['key' => 'logo'], ['value' => $data['logo']]);
+        }
         \App\Models\Setting::updateOrCreate(['key' => 'default_member_markup'], ['value' => $data['default_member_markup']]);
         \App\Models\Setting::updateOrCreate(['key' => 'default_reseller_markup'], ['value' => $data['default_reseller_markup']]);
         
