@@ -45,5 +45,9 @@ class Setting extends Model
         'popup_button_text',
         'popup_button_color',
         'popup_button_bg_color',
+        'footer_text',
+        'social_instagram',
+        'social_telegram',
+        'social_whatsapp',
     ];
 }

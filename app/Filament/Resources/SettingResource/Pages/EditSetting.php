@@ -34,6 +34,11 @@ class EditSetting extends EditRecord
         $data['popup_button_text'] = $data['popup_button_text'] ?? \App\Models\Setting::where('key', 'popup_button_text')->value('value') ?? 'Saya Paham';
         $data['popup_button_color'] = $data['popup_button_color'] ?? \App\Models\Setting::where('key', 'popup_button_color')->value('value') ?? '#ffffff';
         $data['popup_button_bg_color'] = $data['popup_button_bg_color'] ?? \App\Models\Setting::where('key', 'popup_button_bg_color')->value('value') ?? '#3b82f6';
+        
+        $data['footer_text'] = \App\Models\Setting::where('key', 'store_footer')->value('value') ?? \App\Models\Setting::where('key', 'footer_text')->value('value') ?? '';
+        $data['social_instagram'] = \App\Models\Setting::where('key', 'social_instagram')->value('value') ?? '';
+        $data['social_telegram'] = \App\Models\Setting::where('key', 'social_telegram')->value('value') ?? '';
+        $data['social_whatsapp'] = \App\Models\Setting::where('key', 'social_whatsapp')->value('value') ?? '';
 
         return $data;
     }
@@ -55,6 +60,12 @@ class EditSetting extends EditRecord
         \App\Models\Setting::updateOrCreate(['key' => 'popup_button_text'], ['value' => $data['popup_button_text'] ?? '']);
         \App\Models\Setting::updateOrCreate(['key' => 'popup_button_color'], ['value' => $data['popup_button_color'] ?? '']);
         \App\Models\Setting::updateOrCreate(['key' => 'popup_button_bg_color'], ['value' => $data['popup_button_bg_color'] ?? '']);
+
+        \App\Models\Setting::updateOrCreate(['key' => 'store_footer'], ['value' => $data['footer_text'] ?? '']);
+        \App\Models\Setting::updateOrCreate(['key' => 'footer_text'], ['value' => $data['footer_text'] ?? '']);
+        \App\Models\Setting::updateOrCreate(['key' => 'social_instagram'], ['value' => $data['social_instagram'] ?? '']);
+        \App\Models\Setting::updateOrCreate(['key' => 'social_telegram'], ['value' => $data['social_telegram'] ?? '']);
+        \App\Models\Setting::updateOrCreate(['key' => 'social_whatsapp'], ['value' => $data['social_whatsapp'] ?? '']);
 
         $data['value'] = 'site_settings';
         return $data;

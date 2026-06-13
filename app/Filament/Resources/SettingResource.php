@@ -74,6 +74,37 @@ class SettingResource extends Resource
                                 ])
                             ])->collapsible(),
                     ]),
+
+                Tabs\Tab::make('Halaman Bawah (Footer)')
+                    ->icon('heroicon-o-link')
+                    ->schema([
+                        Section::make('Teks Deskripsi Footer')
+                            ->description('Teks yang akan muncul di bagian paling bawah website.')
+                            ->schema([
+                                Textarea::make('footer_text')->label('Teks Copyright / Deskripsi Singkat')->rows(2)->placeholder('Contoh: © 2026 Rayzell Store. All rights reserved.'),
+                            ]),
+                        Section::make('Tautan Sosial Media')
+                            ->description('Isi link sosial media. Kosongkan jika tidak ingin menampilkannya di halaman depan.')
+                            ->schema([
+                                Grid::make(['default' => 1, 'md' => 3])->schema([
+                                    TextInput::make('social_instagram')
+                                        ->label('Link Instagram')
+                                        ->prefixIcon('heroicon-o-camera')
+                                        ->placeholder('https://instagram.com/namakamu')
+                                        ->url(),
+                                    TextInput::make('social_telegram')
+                                        ->label('Link Telegram')
+                                        ->prefixIcon('heroicon-o-paper-airplane')
+                                        ->placeholder('https://t.me/namakamu')
+                                        ->url(),
+                                    TextInput::make('social_whatsapp')
+                                        ->label('Link WhatsApp')
+                                        ->prefixIcon('heroicon-o-chat-bubble-left-ellipsis')
+                                        ->placeholder('https://wa.me/6281234567890')
+                                        ->url(),
+                                ]),
+                            ]),
+                    ]),
             ])->columnSpanFull()
         ]);
     }
