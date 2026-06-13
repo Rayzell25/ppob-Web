@@ -82,6 +82,36 @@ class AuthController extends Controller
             'role' => 'user',
         ]);
 
+        // Send WhatsApp welcome message via Fonnte API
+        try {
+            $fonnteToken = env('FONNTE_TOKEN');
+            $message = "Halo {$user->name}! Selamat datang di Rayzell Store. Akun Anda berhasil didaftarkan dengan email: {$user->email}. Selamat bertransaksi!";
+            $curl = curl_init();
+
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://api.fonnte.com/send',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 30,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => array(
+                    'target' => $user->phone,
+                    'message' => $message,
+                ),
+                CURLOPT_HTTPHEADER => array(
+                    'Authorization: ' . $fonnteToken
+                ),
+            ));
+
+            $response = curl_exec($curl);
+            curl_close($curl);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("Fonnte register notification exception: " . $e->getMessage());
+        }
+
         Auth::login($user);
 
         return redirect('/');
