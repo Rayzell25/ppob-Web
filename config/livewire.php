@@ -184,5 +184,5 @@ return [
 
     'release_token' => 'a',
 
-    'asset_url' => env('ASSET_URL', env('APP_URL', 'http://localhost')),
+    'asset_url' => null,
 ];
