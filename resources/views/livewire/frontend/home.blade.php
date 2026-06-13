@@ -62,6 +62,7 @@
             </div>
         </div>
 
+        <livewire:frontend.footer />
     </div>
 
     <!-- Popup Alpine -->
