@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+use App\Livewire\Storefront;
+use App\Livewire\AdminDashboard;
+
+Route::get('/', Storefront::class)->name('home');
+Route::get('/admin', AdminDashboard::class)->name('admin.dashboard');
