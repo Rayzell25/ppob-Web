@@ -48,7 +48,7 @@ class SendWhatsAppNotification implements ShouldQueue
         $status = $transaction->status;
         $sn = $transaction->serial_number ?: '-';
 
-        $message = "Halo {$name}, transaksi {$product} Anda statusnya: {$status}. SN: {$sn}. Terima kasih!";
+        $message = "Halo {$name}, transaksi {$product} Anda status: {$status}. SN: {$sn}. Terima kasih!";
 
         try {
             $this->whatsAppService->send($target, $message);

@@ -18,10 +18,10 @@ class WhatsAppService
      */
     public function send(string $target, string $message): array
     {
-        $token = config('services.fonnte.token');
+        $token = env('FONNTE_TOKEN') ?: config('services.fonnte.token');
 
         if (!$token) {
-            Log::warning("WhatsApp notification skipped: FONNTE_TOKEN is not configured in services config.");
+            Log::warning("WhatsApp notification skipped: FONNTE_TOKEN is not configured.");
             return ['status' => false, 'reason' => 'Fonnte token not configured'];
         }
 
