@@ -37,8 +37,9 @@ class AppServiceProvider extends ServiceProvider
             SendWhatsAppNotification::class
         );
 
-        Event::listen(function (SocialiteWasCalled $event) {
-            $event->extendSocialite('telegram', TelegramExtendSocialite::class);
-        });
+        Event::listen(
+            SocialiteWasCalled::class,
+            TelegramExtendSocialite::class.'@handle'
+        );
     }
 }
