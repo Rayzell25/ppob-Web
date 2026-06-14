@@ -46,27 +46,24 @@ class SocialLoginController extends Controller
         }
 
         if ($provider === 'telegram') {
-            $data = $request->except('hash');
-            $hash = $request->get('hash');
-            ksort($data);
-            $dataCheckString = implode("\n", array_map(fn($k, $v) => "$k=$v", array_keys($data), $data));
-            $secretKey = hash('sha256', env('TELEGRAM_BOT_TOKEN'), true);
-            $calcHash = hash_hmac('sha256', $dataCheckString, $secretKey);
-            
-            if (hash_equals($calcHash, $hash)) {
+            try {
+                $telegramUser = \Laravel\Socialite\Facades\Socialite::driver('telegram')->user();
                 $user = User::updateOrCreate(
-                    ['telegram_id' => $request->get('id')],
+                    ['telegram_id' => $telegramUser->getId()],
                     [
-                        'name' => $request->get('first_name') ?? 'Telegram User',
-                        'email' => $request->get('id') . '@telegram.rayzell.web.id',
-                        'password' => Hash::make(Str::random(16)),
+                        'name' => $telegramUser->getName() ?? 'Telegram User',
+                        'email' => $telegramUser->getId() . '@telegram.rayzell.web.id',
+                        'password' => bcrypt(\Illuminate\Support\Str::random(16)),
+                        'phone' => 'TG' . $telegramUser->getId(), // WAJIB DIISI DUMMY AGAR TIDAK MENTAL
                         'email_verified_at' => now(),
                     ]
                 );
                 Auth::login($user);
                 return redirect()->intended('/admin');
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Telegram Crash: ' . $e->getMessage());
+                return redirect('/login')->withErrors(['error' => 'Database menolak: ' . $e->getMessage()]);
             }
-            return redirect('/login')->withErrors(['error' => 'Data Telegram tidak valid.']);
         }
 
         // Google flow

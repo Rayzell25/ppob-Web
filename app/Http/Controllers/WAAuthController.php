@@ -52,10 +52,11 @@ class WAAuthController extends Controller
         if (str_contains($identifier, '@')) {
             // Mode Email: Eksekusi dalam Try-Catch
             try {
-                $user->sendPasswordResetNotification($token);
+                dispatch(function () use ($user, $token) {
+                    $user->sendPasswordResetNotification($token);
+                })->afterResponse(); // Eksekusi setelah halaman selesai loading
             } catch (\Exception $e) {
-                Log::error('SMTP Reset Error: ' . $e->getMessage());
-                // Tetap lanjut agar UI sukses, biarkan error tercatat di log
+                \Illuminate\Support\Facades\Log::error('SMTP Blocked: ' . $e->getMessage());
             }
         } else {
             // Mode WhatsApp: Local Baileys Gateway on localhost 3000
