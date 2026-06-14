@@ -76,26 +76,21 @@ class SocialLoginController extends Controller
                     ]);
                 }
             } elseif ($provider === 'telegram') {
-                // Find by telegram_id
-                $user = User::where('telegram_id', $socialUser->getId())->first();
+                $telegramId = $socialUser->getId();
+                $dummyEmail = $telegramId . '@telegram.rayzell.web.id';
 
-                if (!$user) {
-                    $user = User::create([
-                        'name' => $socialUser->getName() ?: $socialUser->getNickname() ?: 'Telegram User',
-                        'email' => $socialUser->getEmail() ?? $socialUser->getId() . '@telegram.local',
-                        'telegram_id' => $socialUser->getId(),
+                $user = User::updateOrCreate(
+                    ['telegram_id' => $telegramId],
+                    [
+                        'name' => $socialUser->getName() ?? $socialUser->getNickname() ?? 'Telegram User',
+                        'email' => $socialUser->getEmail() ?? $dummyEmail,
                         'telegram_username' => $socialUser->getNickname(),
                         'avatar_url' => $socialUser->getAvatar(),
                         'password' => Hash::make(Str::random(24)),
                         'role' => 'user',
-                        'balance' => 0,
-                    ]);
-                } else {
-                    $user->update([
-                        'telegram_username' => $socialUser->getNickname() ?: $user->telegram_username,
-                        'avatar_url' => $socialUser->getAvatar() ?: $user->avatar_url,
-                    ]);
-                }
+                        'email_verified_at' => now(),
+                    ]
+                );
             }
 
             if ($user) {

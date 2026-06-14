@@ -62,9 +62,9 @@ class WAAuthController extends Controller
             $message = "Halo {$user->name}, klik link berikut untuk mereset kata sandi akun PPOB Anda:\n\n" . $resetLink;
 
             try {
-                $response = Http::withHeaders([
+                $response = Http::timeout(5)->withHeaders([
                     'Authorization' => env('FONNTE_TOKEN'),
-                ])->timeout(5)->post('https://api.fonnte.com/send', [
+                ])->post('https://api.fonnte.com/send', [
                     'target' => $user->phone,
                     'message' => $message,
                 ]);
@@ -82,8 +82,8 @@ class WAAuthController extends Controller
             try {
                 $user->sendPasswordResetNotification($token);
             } catch (\Exception $e) {
-                Log::error('SMTP Timeout: ' . $e->getMessage());
-                return back()->withErrors(['identifier' => 'Gagal terhubung ke server Email. Port SMTP mungkin diblokir oleh VPS.']);
+                Log::error('SMTP Error: ' . $e->getMessage());
+                return back()->withErrors(['identifier' => 'Gagal mengirim pesan: Jalur Email diblokir oleh Server.']);
             }
         }
 
