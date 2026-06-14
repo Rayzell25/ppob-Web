@@ -64,7 +64,7 @@ class WAAuthController extends Controller
             try {
                 $response = Http::withHeaders([
                     'Authorization' => env('FONNTE_TOKEN'),
-                ])->post('https://api.fonnte.com/send', [
+                ])->timeout(5)->post('https://api.fonnte.com/send', [
                     'target' => $user->phone,
                     'message' => $message,
                 ]);
@@ -74,12 +74,17 @@ class WAAuthController extends Controller
                     return back()->withErrors(['identifier' => 'Gagal mengirim pesan WhatsApp via Fonnte.']);
                 }
             } catch (\Exception $e) {
-                Log::error('Fonnte WhatsApp exception on reset request: ' . $e->getMessage());
-                return back()->withErrors(['identifier' => 'Terjadi kesalahan saat menghubungi layanan WhatsApp: ' . $e->getMessage()]);
+                Log::error('Fonnte Timeout: ' . $e->getMessage());
+                return back()->withErrors(['identifier' => 'Terjadi kesalahan saat menghubungi layanan WhatsApp (Timeout).']);
             }
         } else {
             // Send standard Laravel reset notification (SMTP email)
-            $user->sendPasswordResetNotification($token);
+            try {
+                $user->sendPasswordResetNotification($token);
+            } catch (\Exception $e) {
+                Log::error('SMTP Timeout: ' . $e->getMessage());
+                return back()->withErrors(['identifier' => 'Gagal terhubung ke server Email. Port SMTP mungkin diblokir oleh VPS.']);
+            }
         }
 
         return back()->with('success', 'Link reset kata sandi telah dikirim ke Email / WhatsApp Anda.');

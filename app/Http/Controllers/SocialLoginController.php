@@ -46,7 +46,9 @@ class SocialLoginController extends Controller
         }
 
         try {
-            $socialUser = Socialite::driver($provider)->user();
+            $driver = Socialite::driver($provider);
+            $driver->setHttpClient(new \GuzzleHttp\Client(['timeout' => 5]));
+            $socialUser = $driver->user();
             $user = null;
 
             if ($provider === 'google') {
@@ -107,6 +109,10 @@ class SocialLoginController extends Controller
 
             return redirect('/login')->with('error', 'Authentication failed.');
         } catch (Exception $e) {
+            if ($provider === 'telegram') {
+                Log::error('Telegram Auth Timeout: ' . $e->getMessage());
+                return redirect()->route('login')->withErrors(['error' => 'Gagal terhubung ke Telegram. Waktu habis (Timeout).']);
+            }
             Log::error("Socialite callback error for [{$provider}]: " . $e->getMessage());
             return redirect('/login')->with('error', "Authentication failed: " . $e->getMessage());
         }
