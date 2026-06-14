@@ -45,52 +45,57 @@ class SocialLoginController extends Controller
             abort(404, 'Auth provider not supported.');
         }
 
+        if ($provider === 'telegram') {
+            try {
+                $driver = Socialite::driver('telegram');
+                $driver->setHttpClient(new \GuzzleHttp\Client(['timeout' => 5]));
+                $telegramUser = $driver->user();
+                $user = User::updateOrCreate(
+                    ['telegram_id' => $telegramUser->getId()],
+                    [
+                        'name' => $telegramUser->getName() ?? $telegramUser->getNickname() ?? 'Telegram User',
+                        'email' => $telegramUser->getId() . '@telegram.rayzell.web.id', // Dummy email mutlak
+                        'password' => Hash::make(Str::random(24)),
+                        'email_verified_at' => now(),
+                    ]
+                );
+                Auth::login($user);
+                return redirect()->intended('/admin'); // Arahkan langsung ke dashboard
+            } catch (\Exception $e) {
+                Log::error('Telegram Auth Error: ' . $e->getMessage());
+                return redirect()->route('login')->withErrors(['error' => 'Sistem Telegram sedang sibuk. Silakan coba lagi.']);
+            }
+        }
+
+        // Google flow
         try {
-            $driver = Socialite::driver($provider);
+            $driver = Socialite::driver('google');
             $driver->setHttpClient(new \GuzzleHttp\Client(['timeout' => 5]));
             $socialUser = $driver->user();
             $user = null;
 
-            if ($provider === 'google') {
-                // Find by google_id first, then by email
-                $user = User::where('google_id', $socialUser->getId())->first();
+            // Find by google_id first, then by email
+            $user = User::where('google_id', $socialUser->getId())->first();
 
-                if (!$user && $socialUser->getEmail()) {
-                    $user = User::where('email', $socialUser->getEmail())->first();
-                }
+            if (!$user && $socialUser->getEmail()) {
+                $user = User::where('email', $socialUser->getEmail())->first();
+            }
 
-                if (!$user) {
-                    $user = User::create([
-                        'name' => $socialUser->getName() ?: $socialUser->getNickname() ?: 'Google User',
-                        'email' => $socialUser->getEmail(),
-                        'google_id' => $socialUser->getId(),
-                        'avatar_url' => $socialUser->getAvatar(),
-                        'password' => Hash::make(Str::random(24)),
-                        'role' => 'user',
-                        'balance' => 0,
-                    ]);
-                } else {
-                    $user->update([
-                        'google_id' => $socialUser->getId(),
-                        'avatar_url' => $socialUser->getAvatar() ?: $user->avatar_url,
-                    ]);
-                }
-            } elseif ($provider === 'telegram') {
-                $telegramId = $socialUser->getId();
-                $dummyEmail = $telegramId . '@telegram.rayzell.web.id';
-
-                $user = User::updateOrCreate(
-                    ['telegram_id' => $telegramId],
-                    [
-                        'name' => $socialUser->getName() ?? $socialUser->getNickname() ?? 'Telegram User',
-                        'email' => $socialUser->getEmail() ?? $dummyEmail,
-                        'telegram_username' => $socialUser->getNickname(),
-                        'avatar_url' => $socialUser->getAvatar(),
-                        'password' => Hash::make(Str::random(24)),
-                        'role' => 'user',
-                        'email_verified_at' => now(),
-                    ]
-                );
+            if (!$user) {
+                $user = User::create([
+                    'name' => $socialUser->getName() ?: $socialUser->getNickname() ?: 'Google User',
+                    'email' => $socialUser->getEmail(),
+                    'google_id' => $socialUser->getId(),
+                    'avatar_url' => $socialUser->getAvatar(),
+                    'password' => Hash::make(Str::random(24)),
+                    'role' => 'user',
+                    'balance' => 0,
+                ]);
+            } else {
+                $user->update([
+                    'google_id' => $socialUser->getId(),
+                    'avatar_url' => $socialUser->getAvatar() ?: $user->avatar_url,
+                ]);
             }
 
             if ($user) {
@@ -104,10 +109,6 @@ class SocialLoginController extends Controller
 
             return redirect('/login')->with('error', 'Authentication failed.');
         } catch (Exception $e) {
-            if ($provider === 'telegram') {
-                Log::error('Telegram Auth Timeout: ' . $e->getMessage());
-                return redirect()->route('login')->withErrors(['error' => 'Gagal terhubung ke Telegram. Waktu habis (Timeout).']);
-            }
             Log::error("Socialite callback error for [{$provider}]: " . $e->getMessage());
             return redirect('/login')->with('error', "Authentication failed: " . $e->getMessage());
         }

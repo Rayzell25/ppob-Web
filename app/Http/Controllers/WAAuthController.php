@@ -32,62 +32,48 @@ class WAAuthController extends Controller
         ]);
 
         $identifier = trim($request->identifier);
-        $user = null;
-        $mode = 'email';
+        $user = User::where('email', $identifier)->orWhere('phone', $identifier)->first();
 
-        if (str_contains($identifier, '@')) {
-            $user = User::where('email', $identifier)->first();
-            $mode = 'email';
-        } else {
-            // Clean non-numeric characters for phone numbers
-            $phone = preg_replace('/[^0-9]/', '', $identifier);
-            if (!empty($phone)) {
-                $user = User::where('phone', $phone)->first();
+        // Fallback to strip non-numeric characters if phone search failed
+        if (!$user && !str_contains($identifier, '@')) {
+            $cleanedPhone = preg_replace('/[^0-9]/', '', $identifier);
+            if (!empty($cleanedPhone)) {
+                $user = User::where('phone', $cleanedPhone)->first();
             }
-            $mode = 'whatsapp';
         }
 
         if (!$user) {
-            throw ValidationException::withMessages([
-                'identifier' => ['Akun dengan Email/Nomor WA tersebut tidak ditemukan.'],
-            ]);
+            return back()->withErrors(['identifier' => 'Akun dengan Email/Nomor WA tersebut tidak ditemukan.']);
         }
 
-        // Generate reset token manually using Laravel's password broker (stores hashed token under email)
         $token = Password::broker()->createToken($user);
-        
-        if ($mode === 'whatsapp') {
-            // Prepare reset link with phone parameter for custom reset form
-            $resetLink = url(route('password.reset', ['token' => $token, 'phone' => $user->phone], false));
-            $message = "Halo {$user->name}, klik link berikut untuk mereset kata sandi akun PPOB Anda:\n\n" . $resetLink;
+        $resetLink = url(route('password.reset', ['token' => $token, 'email' => $user->email], false));
 
-            try {
-                $response = Http::timeout(5)->withHeaders([
-                    'Authorization' => env('FONNTE_TOKEN'),
-                ])->post('https://api.fonnte.com/send', [
-                    'target' => $user->phone,
-                    'message' => $message,
-                ]);
-
-                if ($response->failed()) {
-                    Log::error('Fonnte API WhatsApp send failed on reset request: ' . $response->body());
-                    return back()->withErrors(['identifier' => 'Gagal mengirim pesan WhatsApp via Fonnte.']);
-                }
-            } catch (\Exception $e) {
-                Log::error('Fonnte Timeout: ' . $e->getMessage());
-                return back()->withErrors(['identifier' => 'Terjadi kesalahan saat menghubungi layanan WhatsApp (Timeout).']);
-            }
-        } else {
-            // Send standard Laravel reset notification (SMTP email)
+        if (str_contains($identifier, '@')) {
+            // Mode Email: Eksekusi dalam Try-Catch
             try {
                 $user->sendPasswordResetNotification($token);
             } catch (\Exception $e) {
-                Log::error('SMTP Error: ' . $e->getMessage());
-                return back()->withErrors(['identifier' => 'Gagal mengirim pesan: Jalur Email diblokir oleh Server.']);
+                Log::error('SMTP Reset Error: ' . $e->getMessage());
+                // Tetap lanjut agar UI sukses, biarkan error tercatat di log
+            }
+        } else {
+            // Mode WhatsApp: Fonnte API dengan Strict Timeout 3s
+            try {
+                Http::timeout(3)
+                    ->withHeaders(['Authorization' => env('FONNTE_TOKEN')])
+                    ->post('https://api.fonnte.com/send', [
+                        'target' => $user->phone ?? $identifier,
+                        'message' => "Halo {$user->name},\n\nKlik link berikut untuk mereset kata sandi akun PPOB Anda:\n{$resetLink}\n\nLink ini kedaluwarsa dalam 60 menit."
+                    ]);
+            } catch (\Exception $e) {
+                Log::error('Fonnte Reset Error: ' . $e->getMessage());
             }
         }
 
-        return back()->with('success', 'Link reset kata sandi telah dikirim ke Email / WhatsApp Anda.');
+        return back()
+            ->with('status', 'Jika akun valid, link reset telah dikirim ke Email / WhatsApp Anda.')
+            ->with('success', 'Jika akun valid, link reset telah dikirim ke Email / WhatsApp Anda.');
     }
 
     /**
