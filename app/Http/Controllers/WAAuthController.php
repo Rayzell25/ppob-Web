@@ -58,16 +58,15 @@ class WAAuthController extends Controller
                 // Tetap lanjut agar UI sukses, biarkan error tercatat di log
             }
         } else {
-            // Mode WhatsApp: Fonnte API dengan Strict Timeout 3s
+            // Mode WhatsApp: Local Baileys Gateway on localhost 3000
             try {
-                Http::timeout(3)
-                    ->withHeaders(['Authorization' => env('FONNTE_TOKEN')])
-                    ->post('https://api.fonnte.com/send', [
-                        'target' => $user->phone ?? $identifier,
-                        'message' => "Halo {$user->name},\n\nKlik link berikut untuk mereset kata sandi akun PPOB Anda:\n{$resetLink}\n\nLink ini kedaluwarsa dalam 60 menit."
+                \Illuminate\Support\Facades\Http::timeout(5)
+                    ->post('http://127.0.0.1:3000/send', [
+                        'number' => $user->phone ?? $identifier, // Nomor WhatsApp tujuan
+                        'message' => "Halo,\n\nKlik link berikut untuk mereset kata sandi akun PPOB Anda:\n{$resetLink}"
                     ]);
             } catch (\Exception $e) {
-                Log::error('Fonnte Reset Error: ' . $e->getMessage());
+                \Illuminate\Support\Facades\Log::error('WA Gateway Local Error: ' . $e->getMessage());
             }
         }
 

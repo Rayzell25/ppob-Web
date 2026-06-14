@@ -39,32 +39,34 @@ class SocialLoginController extends Controller
      * @param string $provider
      * @return RedirectResponse
      */
-    public function callback(string $provider)
+    public function callback(string $provider, \Illuminate\Http\Request $request)
     {
         if (!in_array($provider, ['google', 'telegram'])) {
             abort(404, 'Auth provider not supported.');
         }
 
         if ($provider === 'telegram') {
-            try {
-                $driver = Socialite::driver('telegram');
-                $driver->setHttpClient(new \GuzzleHttp\Client(['timeout' => 5]));
-                $telegramUser = $driver->user();
+            $data = $request->except('hash');
+            $hash = $request->get('hash');
+            ksort($data);
+            $dataCheckString = implode("\n", array_map(fn($k, $v) => "$k=$v", array_keys($data), $data));
+            $secretKey = hash('sha256', env('TELEGRAM_BOT_TOKEN'), true);
+            $calcHash = hash_hmac('sha256', $dataCheckString, $secretKey);
+            
+            if (hash_equals($calcHash, $hash)) {
                 $user = User::updateOrCreate(
-                    ['telegram_id' => $telegramUser->getId()],
+                    ['telegram_id' => $request->get('id')],
                     [
-                        'name' => $telegramUser->getName() ?? $telegramUser->getNickname() ?? 'Telegram User',
-                        'email' => $telegramUser->getId() . '@telegram.rayzell.web.id', // Dummy email mutlak
-                        'password' => Hash::make(Str::random(24)),
+                        'name' => $request->get('first_name') ?? 'Telegram User',
+                        'email' => $request->get('id') . '@telegram.rayzell.web.id',
+                        'password' => Hash::make(Str::random(16)),
                         'email_verified_at' => now(),
                     ]
                 );
                 Auth::login($user);
-                return redirect()->intended('/admin'); // Arahkan langsung ke dashboard
-            } catch (\Exception $e) {
-                Log::error('Telegram Auth Error: ' . $e->getMessage());
-                return redirect()->route('login')->withErrors(['error' => 'Sistem Telegram sedang sibuk. Silakan coba lagi.']);
+                return redirect()->intended('/admin');
             }
+            return redirect('/login')->withErrors(['error' => 'Data Telegram tidak valid.']);
         }
 
         // Google flow
