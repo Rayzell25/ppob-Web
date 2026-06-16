@@ -8,7 +8,7 @@
             @if($logo)
                 <img src="{{ asset('storage/'.$logo) }}" alt="{{ $webName }}" class="h-8 md:h-10 w-auto rounded object-contain">
             @endif
-            <span class="{{ $logo ? 'hidden sm:block' : '' }}">{{ $webName }}</span>
+            <span class="{{ $logo ? 'hidden' : '' }}">{{ $webName }}</span>
         </a>
 
         <!-- Menu Kanan: Switcher & Tombol Login -->

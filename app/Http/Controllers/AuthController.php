@@ -89,7 +89,7 @@ class AuthController extends Controller
             $curl = curl_init();
 
             curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://api.fonnte.com/send',
+                CURLOPT_URL => 'http://localhost:3000/send',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,
@@ -98,7 +98,7 @@ class AuthController extends Controller
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => 'POST',
                 CURLOPT_POSTFIELDS => array(
-                    'target' => $user->phone,
+                    'number' => $user->phone,
                     'message' => $message,
                 ),
                 CURLOPT_HTTPHEADER => array(
